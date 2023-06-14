@@ -40,7 +40,7 @@ contract CrossChainBridgeV2 is
     uint256 public myBcId;
 
     // Simple Function Call bridge.
-    ICrossChainFunctionCall private crossChainBridge;
+    ICrossChainFunctionCall private crossChainControl;
 
     // This mapping is used to determine how tokens should
     // be processed when cross-blockchain transfers occur.
@@ -145,21 +145,29 @@ contract CrossChainBridgeV2 is
     event MigratedTo(address token, address newContract, uint256 amount);
 
     /**
-     * @param _crossChainBridge  Simple Function Call protocol implementation.
+     * Initialize the contract.
+     *
+     * @param _crossChainControl    Simple Function Call protocol implementation.
+     * @param _operator             Operator role address.
+     * @param _pauser               Pauser role address.
+     * @param _refunder             Refunder role address.
      */
-    function initialize(address _crossChainBridge) public initializer {
+    function initialize(
+        address _crossChainControl,
+        address _operator,
+        address _pauser,
+        address _refunder
+    ) public initializer {
         __ReentrancyGuard_init();
         __AccessControl_init();
         __Pausable_init();
 
-        address sender = _msgSender();
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _setupRole(OPERATOR_ROLE, _operator);
+        _setupRole(PAUSER_ROLE, _pauser);
+        _setupRole(REFUNDER_ROLE, _refunder);
 
-        _setupRole(DEFAULT_ADMIN_ROLE, sender);
-        _setupRole(OPERATOR_ROLE, sender);
-        _setupRole(PAUSER_ROLE, sender);
-        _setupRole(REFUNDER_ROLE, sender);
-
-        crossChainBridge = ICrossChainFunctionCall(_crossChainBridge);
+        crossChainControl = ICrossChainFunctionCall(_crossChainControl);
     }
 
     /**
@@ -198,7 +206,7 @@ contract CrossChainBridgeV2 is
         // allowance hasn't been set-up.
         _amount = _transferOrBurn(_srcToken, msg.sender, _amount);
 
-        crossChainBridge.crossBlockchainCall(
+        crossChainControl.crossBlockchainCall(
             _destBcId,
             destBridge,
             abi.encodeWithSelector(
@@ -234,7 +242,7 @@ contract CrossChainBridgeV2 is
         uint256 _amount
     ) external whenNotPaused {
         _validate(
-            _msgSender() == address(crossChainBridge),
+            _msgSender() == address(crossChainControl),
             "POSI Bridge: Can not process transfers from contracts other than the bridge contract"
         );
 
@@ -412,7 +420,7 @@ contract CrossChainBridgeV2 is
     function updateCrossChainControl(
         address _crossChainControl
     ) external onlyRole(OPERATOR_ROLE) {
-        crossChainBridge = ICrossChainFunctionCall(_crossChainControl);
+        crossChainControl = ICrossChainFunctionCall(_crossChainControl);
     }
 
     /**

@@ -2,7 +2,7 @@ import { task } from "hardhat/config";
 import { readdir } from "fs/promises";
 import { MigrationContext, Network, Stage } from "../deploy/types";
 import { ContractWrapperFactory } from "../deploy/ContractWrapperFactory";
-import { loadDb } from "../deploy/shared/utils";
+import { DeployDataStore } from "../deploy/DataStore";
 import path = require("path");
 
 task(
@@ -12,14 +12,11 @@ task(
     const network = hre.network.name as Network;
     const basePath = path.join(__dirname, "../deploy/migrations");
     const filenames = await readdir(basePath);
-    const db = loadDb(network);
+    const db = new DeployDataStore(network);
     const context: MigrationContext = {
       stage: taskArgs.stage,
       network: network,
-      factory: new ContractWrapperFactory(
-        db,
-        hre
-      ),
+      factory: new ContractWrapperFactory(db, hre),
       db,
       hre,
     };
@@ -45,7 +42,7 @@ task(
   "listDeployedContract",
   "list all deployed contracts",
   async (taskArgs: { network: Network }) => {
-    const db = loadDb(taskArgs.network);
+    const db = new DeployDataStore(taskArgs.network);
     const data = await db.listAllContracts();
     for (const obj of data) {
       console.log(obj.key, obj.address);

@@ -11,7 +11,7 @@ export interface MigrationDefinition {
   };
 }
 
-export type Stage = "production" | "staging" | "test";
+export type Stage = "production" | "test";
 export type Network = "bscTestnet" | "pscTestnet" | "arbitrumGoerli";
 
 export interface MigrationContext {
@@ -20,4 +20,11 @@ export interface MigrationContext {
   factory: ContractWrapperFactory;
   db: DeployDataStore;
   hre: HardhatRuntimeEnvironment;
+}
+
+export interface DeployCrossChainBridgeParams {
+  crossChainControl: string
+  operator: string
+  pauser: string
+  refunder: string
 }

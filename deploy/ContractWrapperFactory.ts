@@ -2,6 +2,7 @@ import { DeployDataStore } from "./DataStore";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 // @ts-ignore
 import { HardhatDefenderUpgrades } from "@openzeppelin/hardhat-defender";
+import { DeployCrossChainBridgeParams } from "./types";
 
 export class ContractWrapperFactory {
   defender: HardhatDefenderUpgrades;
@@ -35,8 +36,16 @@ export class ContractWrapperFactory {
   }
 
   async getImplementation(proxyAddress: string) {
-    // Ref: https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades#verify
     return this.hre.upgrades.erc1967.getImplementationAddress(proxyAddress);
+  }
+
+  async saveImplementation(contractName: string, proxyAddress: string) {
+    const implAddress = await this.getImplementation(proxyAddress);
+    await this.db.saveAddressByKey(`${contractName}:impl`, implAddress);
+
+    console.log(
+      `Deploy ${contractName} ${proxyAddress} with new implementation ${implAddress}`
+    );
   }
 
   async deployUpgradeableContract(contractName: string, contractArgs: any[]) {
@@ -48,14 +57,8 @@ export class ContractWrapperFactory {
         factory
       );
       await upgraded.deployed();
+      await this.saveImplementation(contractName, contractAddress);
       await this.verifyProxy(contractAddress);
-
-      const implAddress = await this.getImplementation(contractAddress);
-      await this.db.saveAddressByKey(`${contractName}:impl`, implAddress);
-
-      console.log(
-        `Upgrade ${contractName} ${contractAddress} to new implementation ${implAddress}`
-      );
     } else {
       const instance = await this.hre.upgrades.deployProxy(
         factory,
@@ -67,6 +70,7 @@ export class ContractWrapperFactory {
       console.log(`Address ${contractName}: ${address}`);
 
       await this.db.saveAddressByKey(contractName, address);
+      await this.saveImplementation(contractName, address);
       await this.verifyProxy(address);
     }
   }
@@ -75,6 +79,15 @@ export class ContractWrapperFactory {
     await this.deployUpgradeableContract("CrossChainControl", [
       myBcId,
       timeHorizon,
+    ]);
+  }
+
+  async deployCrossChainBridgeV2(params: DeployCrossChainBridgeParams) {
+    await this.deployUpgradeableContract("CrossChainBridgeV2", [
+      params.crossChainControl,
+      params.operator,
+      params.pauser,
+      params.refunder,
     ]);
   }
 }

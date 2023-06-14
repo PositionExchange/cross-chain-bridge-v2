@@ -21,27 +21,6 @@ export class Token<T> {
   }
 }
 
-export interface IVaultTokenConfig {
-  mintProfitBps: number
-  tokenWeight: number
-  maxUsdpAmount: number
-  isStableToken: boolean
-  isShortable: boolean
-}
-
-export interface IPriceFeedConfig {
-  chainLinkPriceFeed: ContractAddress
-  priceFeedDecimals: number
-  spreadBasisPoints: number
-  isStrictStable: boolean
-}
-
-
-export interface IExtraTokenConfig {
-  vaultTokenConfig: IVaultTokenConfig
-  priceFeedConfig: IPriceFeedConfig
-}
-
 type ChainConfig<T> = {
   [chainId: number]: T
 }
