@@ -13,10 +13,6 @@ abstract contract CbcDecVer is OwnableUpgradeable {
     // Address of CrossChain Control Contract on another blockchain.
     mapping(uint256 => address) internal remoteCrossChainControlContracts;
 
-    function initialize() public initializer {
-        __Ownable_init();
-    }
-
     function addVerifier(
         uint256 _blockchainId,
         address _verifier

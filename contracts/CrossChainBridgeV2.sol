@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  */
-pragma solidity >=0.8.0;
+pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
@@ -13,7 +13,7 @@ import "./interface/ICrossChainFunctionCall.sol";
 import "./common/NonAtomicHiddenAuthParameters.sol";
 
 /**
- * Asset bridge using the Simple Function Call protocol.
+ * Cross chain bridge using the Simple Function Call protocol.
  *
  */
 contract CrossChainBridgeV2 is
@@ -555,7 +555,7 @@ contract CrossChainBridgeV2 is
         emit TokenMappingUpdated(_srcToken, _destBcId, _destToken);
     }
 
-    function _validate(bool _condition, string memory _errorMsg) private view {
+    function _validate(bool _condition, string memory _errorMsg) private pure {
         require(_condition, _errorMsg);
     }
 }

@@ -1,5 +1,7 @@
-// SPDX-License-Identifier: BUSL-1.1
-pragma solidity >=0.8.0;
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
+pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -66,6 +68,8 @@ contract CrossChainControl is
         uint256 _myBcId,
         uint256 _timeHorizon
     ) public initializer {
+        __Ownable_init();
+
         myBcId = _myBcId;
         timeHorizon = _timeHorizon;
     }
