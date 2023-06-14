@@ -2,19 +2,27 @@ import {
   DeployCrossChainBridgeParams,
   MigrationContext,
   MigrationDefinition,
+  MultiChainToken,
+  SupportChain,
+  Token,
 } from "../types";
+import { CrossChainBridgeV2 } from "../../typeChain";
+import { ContractTransaction } from "ethers";
+import { TokenConfigs } from "../configs";
 
 const migrations: MigrationDefinition = {
-  getTasks: (context: MigrationContext) => ({
+  getTasks: (ctx: MigrationContext) => ({
     "deploy cross chain bridge v2": async () => {
-      const crossChainControlAddress =
-        (await context.db.findAddressByKey("CrossChainControl")) || "";
+      const chainId: number = ctx.hre.network.config.chainId || 910000; // Default to PSC Testnet
+      const crossChainControlAddress = await ctx.db.findAddressByKey(
+        "CrossChainControl"
+      );
 
       let operator = "";
       let pauser = "";
       let refunder = "";
-      if (context.stage == "test") {
-        const signers = (await context.hre.ethers.getSigners()) || [];
+      if (ctx.stage == "test") {
+        const signers = (await ctx.hre.ethers.getSigners()) || [];
         operator = signers[0].address;
         pauser = signers[0].address;
         refunder = signers[0].address;
@@ -23,13 +31,61 @@ const migrations: MigrationDefinition = {
       }
 
       const params: DeployCrossChainBridgeParams = {
+        myChainId: chainId,
         crossChainControl: crossChainControlAddress,
         operator: operator,
         pauser: pauser,
         refunder: refunder,
       };
 
-      await context.factory.deployCrossChainBridgeV2(params);
+      await ctx.factory.deployCrossChainBridgeV2(params);
+    },
+
+    // Run this after deploying a new contract
+    "re-config cross chain bridge v2": async () => {
+
+      const chainId: number = ctx.hre.network.config.chainId || 0;
+
+      const crossChainBridgeV2 =
+        await ctx.factory.getDeployedContract<CrossChainBridgeV2>(
+          "CrossChainBridgeV2"
+        );
+
+      let tx: Promise<ContractTransaction>;
+
+      // Update dest bridge mapping
+      // Update dest token mapping
+      const supportChains: SupportChain[] = TokenConfigs[chainId].supportChains;
+      for (const destChain: SupportChain of supportChains) {
+        const srcChainId = chainId;
+        const destChainId = destChain.chainId;
+        const destBridge = destChain.remoteBridge;
+
+        tx = crossChainBridgeV2.updateBridgeMapping(destChainId, destBridge);
+        await ctx.factory.waitTx(
+          tx,
+          `crossChainBridgeV2.updateBridgeMapping config chain ${destChainId} to bridge ${destBridge}`
+        );
+
+        for (const token: MultiChainToken of destChain.supportTokens) {
+          const srcToken: Token = token.config[srcChainId];
+          const srcTokenAddress: string = srcToken.address;
+          const srcProcessMethod: number = srcToken.processMethod;
+
+          const destTokenAddress: string = token.config[destChainId].address;
+
+          tx = crossChainBridgeV2.addContractFirstMapping(
+            srcTokenAddress,
+            destChainId,
+            destTokenAddress,
+            srcProcessMethod
+          );
+          await ctx.factory.waitTx(
+            tx,
+            `crossChainBridgeV2.addContractFirstMapping config ${token.name} to chain ${destChainId}`
+          );
+        }
+      }
     },
   }),
 };

@@ -3,6 +3,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 // @ts-ignore
 import { HardhatDefenderUpgrades } from "@openzeppelin/hardhat-defender";
 import { DeployCrossChainBridgeParams } from "./types";
+import {ContractTransaction} from "ethers";
 
 export class ContractWrapperFactory {
   defender: HardhatDefenderUpgrades;
@@ -14,25 +15,28 @@ export class ContractWrapperFactory {
     this.defender = hre.defender;
   }
 
-  async getDeployedContract<T>(
-    contractId: string,
-    contractName?: string
-  ): Promise<T> {
-    if (!contractName) {
-      contractName = contractId;
-    }
-    const address = await this.db.findAddressByKey(contractId);
-    console.log(`ID: ${contractId} Address: ${address}`);
-    if (!address) throw new Error(`Contract ${contractId} not found`);
+  async getDeployedContract<T>(contractName: string): Promise<T> {
+    const address = await this.db.findAddressByKey(contractName);
+    if (!address) throw new Error(`Contract ${contractName} not found`);
+
+    console.log(`ID: ${contractName} Address: ${address}`);
     const contract = await this.hre.ethers.getContractAt(contractName, address);
     return contract as T;
   }
 
-  async verifyProxy(proxyAddress: string) {
+  async verifyContract(contractAddress: string) {
     // Ref: https://docs.openzeppelin.com/upgrades-plugins/1.x/api-hardhat-upgrades#verify
-    return this.hre.run("verify", { address: proxyAddress }).catch((e) => {
-      console.error(`Verify ${proxyAddress} Error`, e);
+    return this.hre.run("verify", { address: contractAddress }).catch((e) => {
+      console.error(`Verify ${contractAddress} Error`, e);
     });
+  }
+
+  async waitTx(tx: Promise<ContractTransaction>, msg?: string) {
+    if (msg) {
+      console.log(`Waiting for tx ${msg}...`)
+    }
+    const receipt = await (await tx).wait(3);
+    console.log(`Tx ${receipt.transactionHash} mined`);
   }
 
   async getImplementation(proxyAddress: string) {
@@ -58,7 +62,7 @@ export class ContractWrapperFactory {
       );
       await upgraded.deployed();
       await this.saveImplementation(contractName, contractAddress);
-      await this.verifyProxy(contractAddress);
+      await this.verifyContract(contractAddress);
     } else {
       const instance = await this.hre.upgrades.deployProxy(
         factory,
@@ -67,11 +71,12 @@ export class ContractWrapperFactory {
       console.log(`wait for deploy ${contractName}`);
       const contract = await instance.deployed();
       const address = await contract.address;
-      console.log(`Address ${contractName}: ${address}`);
 
       await this.db.saveAddressByKey(contractName, address);
+      console.log(`Address ${contractName}: ${address}`);
+
       await this.saveImplementation(contractName, address);
-      await this.verifyProxy(address);
+      await this.verifyContract(address);
     }
   }
 
@@ -84,10 +89,15 @@ export class ContractWrapperFactory {
 
   async deployCrossChainBridgeV2(params: DeployCrossChainBridgeParams) {
     await this.deployUpgradeableContract("CrossChainBridgeV2", [
+      params.myChainId,
       params.crossChainControl,
       params.operator,
       params.pauser,
       params.refunder,
     ]);
+  }
+
+  async deployPrimarySignatureVerifier() {
+    await this.deployUpgradeableContract("PrimarySignatureVerifier", []);
   }
 }

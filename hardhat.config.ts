@@ -95,6 +95,10 @@ module.exports = {
   mocha: {
     timeout: 100000,
   },
+  typechain: {
+    outDir: "typeChain",
+    target: "ethers-v5",
+  },
   docgen: {
     path: "./docs",
   },

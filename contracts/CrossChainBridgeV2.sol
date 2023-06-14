@@ -153,6 +153,7 @@ contract CrossChainBridgeV2 is
      * @param _refunder             Refunder role address.
      */
     function initialize(
+        uint256 _myBcId,
         address _crossChainControl,
         address _operator,
         address _pauser,
@@ -161,6 +162,8 @@ contract CrossChainBridgeV2 is
         __ReentrancyGuard_init();
         __AccessControl_init();
         __Pausable_init();
+
+        myBcId = _myBcId;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(OPERATOR_ROLE, _operator);
@@ -288,7 +291,7 @@ contract CrossChainBridgeV2 is
      * @param _token         Address of token contract on this blockchain.
      * @return address       Contract address of token contract on other blockchain.
      */
-    function getBcIdTokenMaping(
+    function getBcIdTokenMapping(
         uint256 _bcId,
         address _token
     ) public view returns (address) {

@@ -22,12 +22,12 @@ export class DeployDataStore {
     });
   }
 
-  async findAddressByKey(key: string): Promise<string | null> {
+  async findAddressByKey(key: string): Promise<string> {
     const data = await this.db.findOne({ key: key });
     if (data) {
       return data.address;
     }
-    return null;
+    return "";
   }
 
   async saveAddressByKey(key: string, address: string) {
