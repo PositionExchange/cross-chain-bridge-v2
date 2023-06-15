@@ -7,7 +7,7 @@ import {
   TokenConfig,
 } from "../types";
 import { ContractTransaction } from "ethers";
-import { TokenConfigs } from "../configs";
+import { BridgeConfigs } from "../configs";
 
 const migrations: MigrationDefinition = {
   getTasks: (ctx: MigrationContext) => ({
@@ -53,7 +53,7 @@ const migrations: MigrationDefinition = {
 
       // Update dest bridge mapping
       // Update dest token mapping
-      const supportChains: TokenConfig[] = TokenConfigs[chainId].supportChains;
+      const supportChains: TokenConfig[] = BridgeConfigs[chainId].supportChains;
       for (const destChain: TokenConfig of supportChains) {
         const srcChainId = chainId;
         const destChainId = destChain.chainId;

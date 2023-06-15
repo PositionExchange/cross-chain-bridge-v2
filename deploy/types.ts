@@ -1,6 +1,7 @@
 import { ContractWrapperFactory } from "./ContractWrapperFactory";
 import { DeployDataStore } from "./DataStore";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import {BigNumber} from "ethers";
 
 export type MigrationTask = () => Promise<void>;
 
@@ -31,7 +32,7 @@ export interface MultiChainToken {
 export interface Token {
   address: string;
   decimals: number;
-  minTransferAmount: number;
+  minTransferAmount: BigNumber;
   processMethod: number;
   collectFeeMethod: number;
 }
@@ -67,6 +68,14 @@ export interface MultiChainSignerConfig {
 export interface SignerConfig {
   chainId: number;
   signer: string;
+}
+
+export interface DeployMockTokenParams {
+  name: string;
+  symbol: string;
+  decimal: number;
+  isRFI: boolean;
+  minter: string;
 }
 
 export interface DeployCrossChainBridgeParams {

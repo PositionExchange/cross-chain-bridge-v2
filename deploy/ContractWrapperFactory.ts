@@ -2,7 +2,7 @@ import { DeployDataStore } from "./DataStore";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 // @ts-ignore
 import { HardhatDefenderUpgrades } from "@openzeppelin/hardhat-defender";
-import { DeployCrossChainBridgeParams } from "./types";
+import { DeployCrossChainBridgeParams, DeployMockTokenParams } from "./types";
 import { ContractTransaction } from "ethers";
 import {
   CrossChainBridgeV2,
@@ -53,30 +53,38 @@ export class ContractWrapperFactory {
     await this.db.saveAddressByKey(`${contractName}:impl`, implAddress);
   }
 
-  async deployUpgradeableContract(contractName: string, contractArgs: any[]) {
+  async deployUpgradeableContract(
+    contractName: string,
+    contractArgs: any[],
+    contractNameSuffix?: string
+  ) {
     const factory = await this.hre.ethers.getContractFactory(contractName);
     const contractAddress = await this.db.findAddressByKey(contractName);
+    const contractNameFull = contractNameSuffix
+      ? `${contractName}:${contractNameSuffix}`
+      : contractName;
+
     if (contractAddress) {
       const upgraded = await this.hre.upgrades.upgradeProxy(
         contractAddress,
         factory
       );
       await upgraded.deployed();
-      await this.saveImplementation(contractName, contractAddress);
+      await this.saveImplementation(contractNameFull, contractAddress);
       await this.verifyContract(contractAddress);
     } else {
       const instance = await this.hre.upgrades.deployProxy(
         factory,
         contractArgs
       );
-      console.log(`wait for deploy ${contractName}`);
+      console.log(`wait for deploy ${contractNameFull}`);
       const contract = await instance.deployed();
       const address = await contract.address;
 
-      await this.db.saveAddressByKey(contractName, address);
-      console.log(`${contractName} Proxy: ${address}`);
+      await this.db.saveAddressByKey(contractNameFull, address);
+      console.log(`${contractNameFull} Proxy: ${address}`);
 
-      await this.saveImplementation(contractName, address);
+      await this.saveImplementation(contractNameFull, address);
       await this.verifyContract(address);
     }
   }
@@ -92,6 +100,14 @@ export class ContractWrapperFactory {
   async getPrimarySignatureVerifier(): Promise<PrimarySignatureVerifier> {
     return this.getDeployedContract<PrimarySignatureVerifier>(
       "PrimarySignatureVerifier"
+    );
+  }
+
+  async deployMockToken(params: DeployMockTokenParams) {
+    await this.deployUpgradeableContract(
+      "MockToken",
+      [params.name, params.symbol, params.decimal, params.isRFI, params.minter],
+      `:${params.name}`
     );
   }
 
