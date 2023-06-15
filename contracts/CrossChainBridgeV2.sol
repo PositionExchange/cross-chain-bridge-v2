@@ -44,6 +44,9 @@ contract CrossChainBridgeV2 is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant REFUNDER_ROLE = keccak256("REFUNDER_ROLE");
 
+    address public constant NATIVE_COIN_ADDRESS =
+        0x0000000000000000000000000000000000000001;
+
     uint256 public myBcId;
 
     // Simple Function Call bridge.
@@ -222,7 +225,7 @@ contract CrossChainBridgeV2 is
         address _srcToken,
         address _recipient,
         uint256 _amount
-    ) public whenNotPaused nonReentrant {
+    ) public whenNotPaused nonReentrant payable {
         address destBridge = remoteBridges[_destBcId];
         _validate(
             destBridge != address(0),
@@ -235,6 +238,10 @@ contract CrossChainBridgeV2 is
             destToken != address(0),
             "POSI Bridge: Token not transferable to requested blockchain"
         );
+
+        if (_srcToken == NATIVE_COIN_ADDRESS) {
+            _validate(msg.value == _amount, "POSI Bridge: Incorrect amount");
+        }
 
         uint256 minTransferAmt = tokenMinimumTransferAmount[_srcToken];
         _validate(
@@ -581,6 +588,9 @@ contract CrossChainBridgeV2 is
         address _spender,
         uint256 _amount
     ) private {
+        if (_token == NATIVE_COIN_ADDRESS) {
+            return;
+        }
         IERC20Upgradeable(_token).safeTransferFrom(
             _spender,
             address(this),
@@ -593,6 +603,10 @@ contract CrossChainBridgeV2 is
         address _recipient,
         uint256 _amount
     ) private {
+        if (_token == NATIVE_COIN_ADDRESS) {
+            (bool sent, ) = payable(_recipient).call{value: _amount}("");
+            _validate(sent, "Transfer native coin failed");
+        }
         IERC20Upgradeable(_token).safeTransfer(_recipient, _amount);
     }
 
@@ -632,5 +646,8 @@ contract CrossChainBridgeV2 is
 
     function _validate(bool _condition, string memory _errorMsg) private pure {
         require(_condition, _errorMsg);
+    }
+
+    receive() external payable {
     }
 }

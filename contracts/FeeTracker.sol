@@ -10,6 +10,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 contract FeeTracker is OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
+    address public constant NATIVE_COIN_ADDRESS =
+        0x0000000000000000000000000000000000000001;
+
     /**
      * Initialize the contract.
      *
@@ -22,6 +25,12 @@ contract FeeTracker is OwnableUpgradeable {
         address _token,
         address _recipient
     ) external onlyOwner {
+        if (_token == NATIVE_COIN_ADDRESS) {
+            (bool sent, ) = payable(_recipient).call{value: address(this).balance}("");
+            require(sent, "Transfer native coin failed");
+            return;
+        }
+
         IERC20Upgradeable token = IERC20Upgradeable(_token);
         uint256 balance = token.balanceOf(address(this));
         token.safeTransfer(_recipient, balance);
