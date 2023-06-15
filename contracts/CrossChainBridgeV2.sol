@@ -5,12 +5,15 @@ pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "./interface/ICrossChainFunctionCall.sol";
 import "./common/NonAtomicHiddenAuthParameters.sol";
+import "./common/FeeCollector.sol";
 
 /**
  * Cross chain bridge using the Simple Function Call protocol.
@@ -20,8 +23,12 @@ contract CrossChainBridgeV2 is
     NonAtomicHiddenAuthParameters,
     ReentrancyGuardUpgradeable,
     PausableUpgradeable,
-    AccessControlUpgradeable
+    AccessControlUpgradeable,
+    FeeCollector
 {
+    using SafeMathUpgradeable for uint256;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
+
     enum TokenProcessMethod {
         // Token has not been added to the bridge yet.
         NONE,
@@ -40,8 +47,15 @@ contract CrossChainBridgeV2 is
     uint256 public myBcId;
 
     // Simple Function Call bridge.
-    ICrossChainFunctionCall private crossChainControl;
+    ICrossChainFunctionCall public crossChainControl;
 
+    // Addresses of bridges on other blockchains.
+    mapping(uint256 => address) public remoteBridges;
+
+    // ***************************************************************************
+    // ******* Token configuration below here ************************************
+    // ***************************************************************************
+    //
     // This mapping is used to determine how tokens should
     // be processed when cross-blockchain transfers occur.
     //
@@ -59,11 +73,13 @@ contract CrossChainBridgeV2 is
     //  Map (destination blockchain Id => destination token address)
     mapping(address => mapping(uint256 => address)) private tokenAddressMapping;
 
-    // Addresses of bridges on other blockchains.
-    mapping(uint256 => address) public remoteBridges;
-
-    // Token configurations
-    mapping(address => uint256) public minimumTransferAmount;
+    // Mapping of token address on this blockchain and minimum
+    //  transfer amount required for a cross-chain transactions.
+    //
+    // !!! AMOUNT DECIMALS MUST MATCH TOKEN'S DECIMALS !!!
+    //
+    // Map (token address on this blockchain => minimum transfer amount)
+    mapping(address => uint256) public tokenMinimumTransferAmount;
 
     /**
      * Indicates a request to transfer some tokens has occurred on this blockchain.
@@ -82,7 +98,8 @@ contract CrossChainBridgeV2 is
         address destToken,
         address sender,
         address recipient,
-        uint256 amount
+        uint256 amount,
+        uint256 amountAfterFee
     );
 
     /**
@@ -118,12 +135,18 @@ contract CrossChainBridgeV2 is
     /**
      * Token process method configuration has been set / been changed.
      *
-     * @param srcToken            Address of contract on this blockchain.
-     * @param processMethod       Configuration value for the contract.
+     * @param srcToken               Address of token on this blockchain.
+     * @param decimals               Decimals of token on this blockchain.
+     * @param minTransferAmount      Minimum amount required for a transaction.
+     * @param processMethod          Process method for token on this blockchain.
+     * @param collectFeeMethod       Collect fee method for token on this blockchain.
      */
-    event TokenProcessMethodUpdated(
+    event TokenConfigUpdated(
         address srcToken,
-        TokenProcessMethod processMethod
+        uint256 decimals,
+        uint256 minTransferAmount,
+        TokenProcessMethod processMethod,
+        CollectFeeMethod collectFeeMethod
     );
 
     /**
@@ -155,6 +178,7 @@ contract CrossChainBridgeV2 is
     function initialize(
         uint256 _myBcId,
         address _crossChainControl,
+        address _feeTracker,
         address _operator,
         address _pauser,
         address _refunder
@@ -171,6 +195,14 @@ contract CrossChainBridgeV2 is
         _setupRole(REFUNDER_ROLE, _refunder);
 
         crossChainControl = ICrossChainFunctionCall(_crossChainControl);
+
+        feeTracker = _feeTracker;
+
+        // 1%
+        defaultFeePercentage = 990;
+
+        // 2 tokens, must convert to token's decimal before deduction
+        defaultFeeFlatAmount = 2 * 10 ** 18;
     }
 
     /**
@@ -183,7 +215,7 @@ contract CrossChainBridgeV2 is
      * @param _destBcId         Destination blockchain ID.
      * @param _srcToken         Address of contract on this blockchain.
      * @param _recipient        Address of account to transfer tokens to on the destination blockchain.
-     * @param _amount           Amount of tokens to transfer.
+     * @param _amount           Amount of tokens to transfer. Must be >= tokenMinimumTransferAmount.
      */
     function transferToOtherBlockchain(
         uint256 _destBcId,
@@ -204,10 +236,18 @@ contract CrossChainBridgeV2 is
             "POSI Bridge: Token not transferable to requested blockchain"
         );
 
+        uint256 minTransferAmt = tokenMinimumTransferAmount[_srcToken];
+        _validate(
+            _amount >= minTransferAmt,
+            "POSI Bridge: Amount below minimum transfer amount"
+        );
+
+        (uint256 amountAfterFee, ) = _collectFee(_srcToken, _amount);
+
         // Transfer tokens from the user to this contract.
         // The transfer will revert if the account has inadequate balance or if adequate
         // allowance hasn't been set-up.
-        _amount = _transferOrBurn(_srcToken, msg.sender, _amount);
+        _transferOrBurn(_srcToken, msg.sender, amountAfterFee);
 
         crossChainControl.crossBlockchainCall(
             _destBcId,
@@ -216,7 +256,7 @@ contract CrossChainBridgeV2 is
                 this.receiveFromOtherBlockchain.selector,
                 destToken,
                 _recipient,
-                _amount
+                amountAfterFee
             )
         );
 
@@ -227,7 +267,8 @@ contract CrossChainBridgeV2 is
             destToken,
             msg.sender,
             _recipient,
-            _amount
+            _amount,
+            amountAfterFee
         );
     }
 
@@ -264,7 +305,7 @@ contract CrossChainBridgeV2 is
             "POSI Bridge: Incorrect source Bridge"
         );
 
-        _amount = _transferOrMint(_destToken, _recipient, _amount);
+        _transferOrMint(_destToken, _recipient, _amount);
 
         emit ReceivedFrom(srcBcId, srcBridge, _destToken, _recipient, _amount);
     }
@@ -347,14 +388,23 @@ contract CrossChainBridgeV2 is
         address _srcToken,
         uint256 _destBcId,
         address _destToken,
-        TokenProcessMethod _processMethod
+        uint256 _decimals,
+        uint256 _minTransferAmount,
+        TokenProcessMethod _processMethod,
+        CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
         _validate(
             !_tokenExists(_srcToken),
             "POSI Bridge: token already configured"
         );
 
-        _setTokenConfig(_srcToken, _processMethod);
+        _setTokenConfig(
+            _srcToken,
+            _decimals,
+            _minTransferAmount,
+            _processMethod,
+            _collectFeeMethod
+        );
         _updateContractMapping(_srcToken, _destBcId, _destToken);
     }
 
@@ -371,10 +421,19 @@ contract CrossChainBridgeV2 is
      */
     function setTokenConfig(
         address _srcToken,
-        TokenProcessMethod _processMethod
+        uint256 _decimals,
+        uint256 _minTransferAmount,
+        TokenProcessMethod _processMethod,
+        CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
         _validate(_tokenExists(_srcToken), "POSI Bridge: token not configured");
-        _setTokenConfig(_srcToken, _processMethod);
+        _setTokenConfig(
+            _srcToken,
+            _decimals,
+            _minTransferAmount,
+            _processMethod,
+            _collectFeeMethod
+        );
     }
 
     /**
@@ -473,20 +532,17 @@ contract CrossChainBridgeV2 is
         address _token,
         address _recipient,
         uint256 _amount
-    ) private returns (uint256) {
+    ) private {
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
-            if (!_transferOut(_token, _recipient, _amount)) {
-                revert("transfer failed");
-            }
+            _transferOut(_token, _recipient, _amount);
         } else {
             ERC20PresetMinterPauserUpgradeable(_token).mint(
                 _recipient,
                 _amount
             );
         }
-        return _amount;
     }
 
     /**
@@ -507,54 +563,62 @@ contract CrossChainBridgeV2 is
         address _token,
         address _spender,
         uint256 _amount
-    ) private returns (uint256) {
+    ) private {
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
-            _validate(
-                _transferIn(_spender, address(this), _amount),
-                "transferFrom failed"
-            );
+            _transferIn(_spender, address(this), _amount);
         } else {
             ERC20PresetMinterPauserUpgradeable(_token).burnFrom(
                 _spender,
                 _amount
             );
         }
-        return _amount;
     }
 
     function _transferIn(
         address _token,
         address _spender,
         uint256 _amount
-    ) private returns (bool) {
-        return
-            IERC20Upgradeable(_token).transferFrom(
-                _spender,
-                address(this),
-                _amount
-            );
+    ) private {
+        IERC20Upgradeable(_token).safeTransferFrom(
+            _spender,
+            address(this),
+            _amount
+        );
     }
 
     function _transferOut(
         address _token,
         address _recipient,
         uint256 _amount
-    ) private returns (bool) {
-        return IERC20Upgradeable(_token).transfer(_recipient, _amount);
+    ) private {
+        IERC20Upgradeable(_token).safeTransfer(_recipient, _amount);
     }
 
-    function _tokenExists(address _tokenContract) private view returns (bool) {
-        return tokenProcessMethods[_tokenContract] != TokenProcessMethod.NONE;
+    function _tokenExists(address _token) private view returns (bool) {
+        return tokenProcessMethods[_token] != TokenProcessMethod.NONE;
     }
 
     function _setTokenConfig(
         address _token,
-        TokenProcessMethod _processMethod
+        uint256 _decimals,
+        uint256 _minTransferAmount,
+        TokenProcessMethod _processMethod,
+        CollectFeeMethod _collectFeeMethod
     ) private {
+        tokenDecimals[_token] = _decimals;
+        tokenMinimumTransferAmount[_token] = _minTransferAmount;
         tokenProcessMethods[_token] = _processMethod;
-        emit TokenProcessMethodUpdated(_token, _processMethod);
+        tokenCollectFeeMethod[_token] = _collectFeeMethod;
+
+        emit TokenConfigUpdated(
+            _token,
+            _decimals,
+            _minTransferAmount,
+            _processMethod,
+            _collectFeeMethod
+        );
     }
 
     function _updateContractMapping(

@@ -63,16 +63,16 @@ const migrations: MigrationDefinition = {
 
         for (const token: MultiChainToken of destChain.supportTokens) {
           const srcToken: Token = token.config[srcChainId];
-          const srcTokenAddress: string = srcToken.address;
-          const srcProcessMethod: number = srcToken.processMethod;
-
           const destTokenAddress: string = token.config[destChainId].address;
 
           tx = crossChainBridgeV2.addContractFirstMapping(
-            srcTokenAddress,
+            srcToken.address,
             destChainId,
             destTokenAddress,
-            srcProcessMethod
+            srcToken.decimals,
+            srcToken.minTransferAmount,
+            srcToken.processMethod,
+            srcToken.collectFeeMethod
           );
           await ctx.factory.waitTx(
             tx,

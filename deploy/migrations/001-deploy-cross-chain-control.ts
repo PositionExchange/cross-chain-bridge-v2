@@ -36,13 +36,13 @@ const migrations: MigrationDefinition = {
         tx = crossChainControl.addRemoteCrossChainControl(destChainId, destCBC);
         await ctx.factory.waitTx(
           tx,
-          `crossChainControl.addRemoteCrossChainControl ${destCBC} to chain ${destChainId}`
+          `crossChainControl.addRemoteCrossChainControl ${destCBC} for chain ${destChainId}`
         );
 
         tx = crossChainControl.addVerifier(destChainId, destVerifier);
         await ctx.factory.waitTx(
           tx,
-          `crossChainControl.addVerifier ${destVerifier} to chain ${destChainId}`
+          `crossChainControl.addVerifier ${destVerifier} for chain ${destChainId}`
         );
       }
     },

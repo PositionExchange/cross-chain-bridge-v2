@@ -3,7 +3,6 @@
  */
 pragma solidity ^0.8.8;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./interface/ICrossChainFunctionCall.sol";

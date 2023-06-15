@@ -29,9 +29,11 @@ export interface MultiChainToken {
 }
 
 export interface Token {
-  decimal: number;
   address: string;
+  decimals: number;
+  minTransferAmount: number;
   processMethod: number;
+  collectFeeMethod: number;
 }
 
 type ChainConfig<T> = {

@@ -23,7 +23,7 @@ const migrations: MigrationDefinition = {
         tx = verifier.updateSigner(destChainId, destSigner);
         await ctx.factory.waitTx(
           tx,
-          `primarySignatureVerifier.updateSigner ${destSigner} to chain ${destChainId}`
+          `primarySignatureVerifier.updateSigner ${destSigner} for chain ${destChainId}`
         );
       }
     },
