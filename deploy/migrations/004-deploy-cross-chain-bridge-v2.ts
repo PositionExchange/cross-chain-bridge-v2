@@ -16,6 +16,9 @@ const migrations: MigrationDefinition = {
       const crossChainControlAddress = await ctx.db.findAddressByKey(
         "CrossChainControl"
       );
+      const feeTrackerAddress = await ctx.db.findAddressByKey(
+        "FeeTracker"
+      );
 
       let operator = "";
       let pauser = "";
@@ -32,6 +35,7 @@ const migrations: MigrationDefinition = {
       const params: DeployCrossChainBridgeParams = {
         myChainId: chainId,
         crossChainControl: crossChainControlAddress,
+        feeTracker: feeTrackerAddress,
         operator: operator,
         pauser: pauser,
         refunder: refunder,

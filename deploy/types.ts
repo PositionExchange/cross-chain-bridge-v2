@@ -72,6 +72,7 @@ export interface SignerConfig {
 export interface DeployCrossChainBridgeParams {
   myChainId: number;
   crossChainControl: string;
+  feeTracker: string;
   operator: string;
   pauser: string;
   refunder: string;

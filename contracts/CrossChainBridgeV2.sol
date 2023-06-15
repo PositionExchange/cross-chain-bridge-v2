@@ -225,7 +225,7 @@ contract CrossChainBridgeV2 is
         address _srcToken,
         address _recipient,
         uint256 _amount
-    ) public whenNotPaused nonReentrant payable {
+    ) public payable whenNotPaused nonReentrant {
         address destBridge = remoteBridges[_destBcId];
         _validate(
             destBridge != address(0),
@@ -493,6 +493,20 @@ contract CrossChainBridgeV2 is
     }
 
     /**
+     * Update fee tracker contract
+     *
+     * Requirements:
+     * - the caller must have the `OPERATOR_ROLE`.
+     *
+     * @param _feeTracker          Address of fee tracker contract
+     */
+    function updateFeeTracker(
+        address _feeTracker
+    ) external onlyRole(OPERATOR_ROLE) {
+        feeTracker = _feeTracker;
+    }
+
+    /**
      * Transfer any amount of any to anyone. This is needed to provide refunds to
      * customers who have had failed transactions where the token transfer occurred on this
      * blockchain, but did not happen on the destination blockchain.
@@ -648,6 +662,5 @@ contract CrossChainBridgeV2 is
         require(_condition, _errorMsg);
     }
 
-    receive() external payable {
-    }
+    receive() external payable {}
 }

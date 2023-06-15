@@ -106,6 +106,7 @@ export class ContractWrapperFactory {
     await this.deployUpgradeableContract("CrossChainBridgeV2", [
       params.myChainId,
       params.crossChainControl,
+      params.feeTracker,
       params.operator,
       params.pauser,
       params.refunder,
@@ -114,5 +115,9 @@ export class ContractWrapperFactory {
 
   async deployPrimarySignatureVerifier() {
     await this.deployUpgradeableContract("PrimarySignatureVerifier", []);
+  }
+
+  async deployFeeTracker() {
+    await this.deployUpgradeableContract("FeeTracker", []);
   }
 }
