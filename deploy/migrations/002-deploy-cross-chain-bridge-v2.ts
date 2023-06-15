@@ -6,7 +6,6 @@ import {
   Token,
   TokenConfig,
 } from "../types";
-import { CrossChainBridgeV2 } from "../../typeChain";
 import { ContractTransaction } from "ethers";
 import { TokenConfigs } from "../configs";
 

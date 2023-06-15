@@ -1,6 +1,5 @@
 import { MigrationContext, MigrationDefinition, SignerConfig } from "../types";
 import { SignerConfigs } from "../configs";
-import { PrimarySignatureVerifier } from "../../typeChain";
 import { ContractTransaction } from "ethers";
 
 const migrations: MigrationDefinition = {

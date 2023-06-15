@@ -42,7 +42,7 @@ module.exports = {
       accounts: [BSC_TESTNET_DEPLOYER_KEY],
     },
     pscTestnet: {
-      url: "https://api.s0.t.posichain.org/",
+      url: "https://api.t.posichain.org/",
       chainId: 910000,
       accounts: [PSC_TESTNET_DEPLOYER_KEY],
     },
@@ -72,15 +72,14 @@ module.exports = {
       bsc: BSC_API_KEY,
       arbitrumGoerli: ARB_API_KEY,
       arbitrumOne: ARB_API_KEY,
-      pscTestnet: PSC_API_KEY,
     },
     customChains: [
       {
         network: "pscTestnet",
         chainId: 910000,
         urls: {
-          apiURL: "https://apex-testnet.posichain.org/contract-verifier/verify",
-          browserURL: "http://explorer-testnet.posichain.org",
+          apiURL: "https://explorer-testnet.posichain.org/api",
+          browserURL: "https://explorer-testnet.posichain.org",
         },
       },
     ],

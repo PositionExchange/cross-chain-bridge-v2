@@ -51,10 +51,6 @@ export class ContractWrapperFactory {
   async saveImplementation(contractName: string, proxyAddress: string) {
     const implAddress = await this.getImplementation(proxyAddress);
     await this.db.saveAddressByKey(`${contractName}:impl`, implAddress);
-
-    console.log(
-      `Deploy ${contractName} ${proxyAddress} with new implementation ${implAddress}`
-    );
   }
 
   async deployUpgradeableContract(contractName: string, contractArgs: any[]) {
@@ -78,7 +74,7 @@ export class ContractWrapperFactory {
       const address = await contract.address;
 
       await this.db.saveAddressByKey(contractName, address);
-      console.log(`Address ${contractName}: ${address}`);
+      console.log(`${contractName} Proxy: ${address}`);
 
       await this.saveImplementation(contractName, address);
       await this.verifyContract(address);
