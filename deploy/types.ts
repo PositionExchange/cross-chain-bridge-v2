@@ -38,14 +38,33 @@ type ChainConfig<T> = {
   [chainId: number]: T;
 };
 
-export interface MultiChainTokenConfig {
-  supportChains: SupportChain[];
+export interface MultiCrossChainControlConfig {
+  supportChains: CrossChainControlConfig[];
 }
 
-export interface SupportChain {
+export interface CrossChainControlConfig {
+  chainId: number;
+  verifier: string;
+  destCrossChainControl: string;
+}
+
+export interface MultiChainTokenConfig {
+  supportChains: TokenConfig[];
+}
+
+export interface TokenConfig {
   chainId: number;
   remoteBridge: string;
   supportTokens: MultiChainToken[];
+}
+
+export interface MultiChainSignerConfig {
+  supportChains: SignerConfig[];
+}
+
+export interface SignerConfig {
+  chainId: number;
+  signer: string;
 }
 
 export interface DeployCrossChainBridgeParams {

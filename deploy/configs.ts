@@ -1,4 +1,9 @@
-import { MultiChainToken, MultiChainTokenConfig } from "./types";
+import {
+  MultiChainSignerConfig,
+  MultiChainToken,
+  MultiChainTokenConfig,
+  MultiCrossChainControlConfig,
+} from "./types";
 
 export const POSI: MultiChainToken = {
   name: "POSI",
@@ -31,12 +36,22 @@ export const TokenConfigs: {
       { chainId: 910000, supportTokens: [POSI], remoteBridge: "" },
     ],
   },
-  // 421613: {
-  //   supportTokens: [POSI],
-  //   supportChains: [97, 910000],
-  // },
-  // 910000: {
-  //   supportTokens: [POSI],
-  //   supportChains: [97, 421613],
-  // },
+};
+
+export const CBCConfigs: {
+  [chainId: number]: MultiCrossChainControlConfig;
+} = {
+  97: {
+    supportChains: [
+      { chainId: 421613, destCrossChainControl: "", verifier: "" },
+    ],
+  },
+};
+
+export const SignerConfigs: {
+  [chainId: number]: MultiChainSignerConfig;
+} = {
+  97: {
+    supportChains: [{ chainId: 421613, signer: "" }],
+  },
 };

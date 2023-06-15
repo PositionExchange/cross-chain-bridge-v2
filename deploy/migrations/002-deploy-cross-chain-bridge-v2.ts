@@ -3,8 +3,8 @@ import {
   MigrationContext,
   MigrationDefinition,
   MultiChainToken,
-  SupportChain,
   Token,
+  TokenConfig,
 } from "../types";
 import { CrossChainBridgeV2 } from "../../typeChain";
 import { ContractTransaction } from "ethers";
@@ -43,20 +43,15 @@ const migrations: MigrationDefinition = {
 
     // Run this after deploying a new contract
     "re-config cross chain bridge v2": async () => {
-
       const chainId: number = ctx.hre.network.config.chainId || 0;
-
-      const crossChainBridgeV2 =
-        await ctx.factory.getDeployedContract<CrossChainBridgeV2>(
-          "CrossChainBridgeV2"
-        );
+      const crossChainBridgeV2 = await ctx.factory.getCrossChainBridgeV2();
 
       let tx: Promise<ContractTransaction>;
 
       // Update dest bridge mapping
       // Update dest token mapping
-      const supportChains: SupportChain[] = TokenConfigs[chainId].supportChains;
-      for (const destChain: SupportChain of supportChains) {
+      const supportChains: TokenConfig[] = TokenConfigs[chainId].supportChains;
+      for (const destChain: TokenConfig of supportChains) {
         const srcChainId = chainId;
         const destChainId = destChain.chainId;
         const destBridge = destChain.remoteBridge;

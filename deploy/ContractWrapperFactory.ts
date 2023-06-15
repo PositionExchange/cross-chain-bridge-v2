@@ -3,7 +3,12 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 // @ts-ignore
 import { HardhatDefenderUpgrades } from "@openzeppelin/hardhat-defender";
 import { DeployCrossChainBridgeParams } from "./types";
-import {ContractTransaction} from "ethers";
+import { ContractTransaction } from "ethers";
+import {
+  CrossChainBridgeV2,
+  CrossChainControl,
+  PrimarySignatureVerifier,
+} from "../typeChain";
 
 export class ContractWrapperFactory {
   defender: HardhatDefenderUpgrades;
@@ -33,7 +38,7 @@ export class ContractWrapperFactory {
 
   async waitTx(tx: Promise<ContractTransaction>, msg?: string) {
     if (msg) {
-      console.log(`Waiting for tx ${msg}...`)
+      console.log(`Waiting for tx ${msg}...`);
     }
     const receipt = await (await tx).wait(3);
     console.log(`Tx ${receipt.transactionHash} mined`);
@@ -78,6 +83,20 @@ export class ContractWrapperFactory {
       await this.saveImplementation(contractName, address);
       await this.verifyContract(address);
     }
+  }
+
+  async getCrossChainControl(): Promise<CrossChainControl> {
+    return this.getDeployedContract<CrossChainControl>("CrossChainControl");
+  }
+
+  async getCrossChainBridgeV2(): Promise<CrossChainBridgeV2> {
+    return this.getDeployedContract<CrossChainBridgeV2>("CrossChainBridgeV2");
+  }
+
+  async getPrimarySignatureVerifier(): Promise<PrimarySignatureVerifier> {
+    return this.getDeployedContract<PrimarySignatureVerifier>(
+      "PrimarySignatureVerifier"
+    );
   }
 
   async deployCrossChainControl(myBcId: number, timeHorizon: number) {

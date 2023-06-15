@@ -1,9 +1,32 @@
-import { MigrationContext, MigrationDefinition } from "../types";
+import { MigrationContext, MigrationDefinition, SignerConfig } from "../types";
+import { SignerConfigs } from "../configs";
+import { PrimarySignatureVerifier } from "../../typeChain";
+import { ContractTransaction } from "ethers";
 
 const migrations: MigrationDefinition = {
-  getTasks: (context: MigrationContext) => ({
+  getTasks: (ctx: MigrationContext) => ({
     "deploy primary signature verifier": async () => {
-      await context.factory.deployPrimarySignatureVerifier();
+      await ctx.factory.deployPrimarySignatureVerifier();
+    },
+
+    "re-config primary signature verifier": async () => {
+      const chainId: number = ctx.hre.network.config.chainId || 0;
+      const verifier = await ctx.factory.getPrimarySignatureVerifier();
+
+      let tx: Promise<ContractTransaction>;
+
+      const supportChains: SignerConfig[] =
+        SignerConfigs[chainId].supportChains;
+      for (const destChain: SignerConfig of supportChains) {
+        const destChainId = destChain.chainId;
+        const destSigner = destChain.signer;
+
+        tx = verifier.updateSigner(destChainId, destSigner);
+        await ctx.factory.waitTx(
+          tx,
+          `primarySignatureVerifier.updateSigner ${destSigner} to chain ${destChainId}`
+        );
+      }
     },
   }),
 };

@@ -4,6 +4,9 @@
 pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
+
 import "../interface/ICrossChainVerifier.sol";
 
 contract PrimarySignatureVerifier is ICrossChainVerifier, OwnableUpgradeable {
@@ -25,17 +28,47 @@ contract PrimarySignatureVerifier is ICrossChainVerifier, OwnableUpgradeable {
     function supportedSigningAlgorithm(
         uint256 /* _blockchainId */
     ) external pure override returns (uint256) {
-        return 1;
         // ECDSA SIGNATURE CODE
+        return 1;
     }
 
     function decodeAndVerifyEvent(
         uint256 _blockchainId,
-        bytes32 _eventSig,
+        bytes32 /* _eventSig */,
         bytes calldata _signedEventInfo,
         bytes calldata _signature
     ) external view override returns (bool) {
+        address signer = _signers[_blockchainId];
+        require(signer != address(0), "No registered signer for blockchain");
+
+        bool valid = isSignatureValid(signer, _signedEventInfo, _signature);
+        require(valid, "Invalid signature");
+
         return true;
+    }
+
+    function isSignatureValid(
+        address _signer,
+        bytes calldata _signedEventInfo,
+        bytes calldata _signature
+    ) public view returns (bool) {
+        bytes32 messageHash = getMessageHash(_signedEventInfo);
+        return
+            SignatureCheckerUpgradeable.isValidSignatureNow(
+                _signer,
+                getSignedMessageHash(messageHash),
+                _signature
+            );
+    }
+
+    function getMessageHash(
+        bytes calldata _signedEventInfo
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_signedEventInfo));
+    }
+
+    function getSignedMessageHash(bytes32 hash) public pure returns (bytes32) {
+        return ECDSAUpgradeable.toEthSignedMessageHash(hash);
     }
 
     // ***************************************************************************

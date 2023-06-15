@@ -1,6 +1,6 @@
 import { MigrationContext, MigrationDefinition } from "../types";
-import { ContractTransaction, ethers } from "ethers";
-import { CrossChainBridgeV2 } from "../../typeChain";
+import { ContractTransaction } from "ethers";
+import { CBCConfigs } from "../configs";
 
 const migrations: MigrationDefinition = {
   getTasks: (ctx: MigrationContext) => ({
@@ -13,19 +13,38 @@ const migrations: MigrationDefinition = {
 
     // Run this after deploying a new contract
     "re-config cross chain control": async () => {
-      const crossChainControl = await ctx.db.findAddressByKey(
-        "CrossChainControl"
-      );
-
-      const crossChainBridgeV2 =
-        await ctx.factory.getDeployedContract<CrossChainBridgeV2>(
-          "CrossChainBridgeV2"
-        );
+      const chainId: number = ctx.hre.network.config.chainId || 0;
+      const crossChainControl = await ctx.factory.getCrossChainControl();
+      const crossChainBridgeV2 = await ctx.factory.getCrossChainBridgeV2();
 
       let tx: Promise<ContractTransaction>;
 
-      tx = crossChainBridgeV2.updateCrossChainControl(crossChainControl);
-      await ctx.factory.waitTx(tx, "crossChainBridgeV2.updateCrossChainControl");
+      tx = crossChainBridgeV2.updateCrossChainControl(
+        crossChainControl.address
+      );
+      await ctx.factory.waitTx(
+        tx,
+        "crossChainBridgeV2.updateCrossChainControl"
+      );
+
+      const supportChains = CBCConfigs[chainId].supportChains;
+      for (const destChain of supportChains) {
+        const destChainId: number = destChain.chainId;
+        const destCBC: string = destChain.destCrossChainControl;
+        const destVerifier: string = destChain.verifier;
+
+        tx = crossChainControl.addRemoteCrossChainControl(destChainId, destCBC);
+        await ctx.factory.waitTx(
+          tx,
+          `crossChainControl.addRemoteCrossChainControl ${destCBC} to chain ${destChainId}`
+        );
+
+        tx = crossChainControl.addVerifier(destChainId, destVerifier);
+        await ctx.factory.waitTx(
+          tx,
+          `crossChainControl.addVerifier ${destVerifier} to chain ${destChainId}`
+        );
+      }
     },
   }),
 };
