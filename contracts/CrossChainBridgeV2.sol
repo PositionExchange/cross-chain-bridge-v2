@@ -14,6 +14,7 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "./interface/ICrossChainFunctionCall.sol";
 import "./common/NonAtomicHiddenAuthParameters.sol";
 import "./common/FeeCollector.sol";
+import "./common/TransferUtil.sol";
 
 /**
  * Cross chain bridge using the Simple Function Call protocol.
@@ -44,6 +45,7 @@ contract CrossChainBridgeV2 is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant REFUNDER_ROLE = keccak256("REFUNDER_ROLE");
 
+    // @Deprecated: Remove this when deploy a new contract.
     address public constant NATIVE_COIN_ADDRESS =
         0x0000000000000000000000000000000000000001;
 
@@ -239,7 +241,7 @@ contract CrossChainBridgeV2 is
             "POSI Bridge: Token not transferable to requested blockchain"
         );
 
-        if (_srcToken == NATIVE_COIN_ADDRESS) {
+        if (TransferUtil._isNativeCoin(_srcToken)) {
             _validate(msg.value == _amount, "POSI Bridge: Incorrect amount");
         }
 
@@ -250,6 +252,7 @@ contract CrossChainBridgeV2 is
         );
 
         (uint256 amountAfterFee, ) = _collectFee(_srcToken, _amount);
+        _validate(amountAfterFee > 0, "POSI Bridge: Amount after fee is zero");
 
         // Transfer tokens from the user to this contract.
         // The transfer will revert if the account has inadequate balance or if adequate
@@ -400,10 +403,10 @@ contract CrossChainBridgeV2 is
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
-        _validate(
-            !_tokenExists(_srcToken),
-            "POSI Bridge: token already configured"
-        );
+        //        _validate(
+        //            !_tokenExists(_srcToken),
+        //            "POSI Bridge: token already configured"
+        //        );
 
         _setTokenConfig(
             _srcToken,
@@ -557,7 +560,7 @@ contract CrossChainBridgeV2 is
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
-            _transferOut(_token, _recipient, _amount);
+            TransferUtil._out(_token, _recipient, _amount);
         } else {
             ERC20PresetMinterPauserUpgradeable(_token).mint(
                 _recipient,
@@ -588,40 +591,13 @@ contract CrossChainBridgeV2 is
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
-            _transferIn(_spender, address(this), _amount);
+            TransferUtil._in(_token, _spender, _amount);
         } else {
             ERC20PresetMinterPauserUpgradeable(_token).burnFrom(
                 _spender,
                 _amount
             );
         }
-    }
-
-    function _transferIn(
-        address _token,
-        address _spender,
-        uint256 _amount
-    ) private {
-        if (_token == NATIVE_COIN_ADDRESS) {
-            return;
-        }
-        IERC20Upgradeable(_token).safeTransferFrom(
-            _spender,
-            address(this),
-            _amount
-        );
-    }
-
-    function _transferOut(
-        address _token,
-        address _recipient,
-        uint256 _amount
-    ) private {
-        if (_token == NATIVE_COIN_ADDRESS) {
-            (bool sent, ) = payable(_recipient).call{value: _amount}("");
-            _validate(sent, "Transfer native coin failed");
-        }
-        IERC20Upgradeable(_token).safeTransfer(_recipient, _amount);
     }
 
     function _tokenExists(address _token) private view returns (bool) {

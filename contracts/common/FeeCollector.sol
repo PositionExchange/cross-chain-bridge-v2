@@ -4,13 +4,12 @@
 pragma solidity >=0.8;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "../interface/ICrossChainVerifier.sol";
+import "./TransferUtil.sol";
 
 abstract contract FeeCollector {
     using SafeMathUpgradeable for uint256;
-    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     address public feeTracker;
     uint256 public defaultFeePercentage;
@@ -40,12 +39,12 @@ abstract contract FeeCollector {
     }
 
     /**
-     * Indicates a transfer request has been received on this blockchain.
+     * Indicates an amount has been added to fee reserves on this blockchain.
      *
      * @param token              Token address from this blockchain.
      * @param amount             Fee amount collected, and transfer to FeeTracker contract.
      */
-    event FeeCollected(address token, uint256 amount);
+    event FeeReserveIncreased(address token, uint256 amount);
 
     function _collectFee(
         address _token,
@@ -75,18 +74,28 @@ abstract contract FeeCollector {
             amountAfterFee = _amountAfterFeePercent(amountAfterFee);
         }
 
-        uint256 fee = amountAfterFee.sub(_amount);
-        IERC20Upgradeable(_token).safeTransfer(feeTracker, fee);
-        emit FeeCollected(_token, fee);
+        uint256 fee = _amount.sub(amountAfterFee);
+        _increaseFeeReserves(_token, fee);
 
         return (amountAfterFee, fee);
+    }
+
+    function _increaseFeeReserves(
+        address _token,
+        uint256 _amount
+    ) private {
+        TransferUtil._out(_token, feeTracker, fee);
+        emit FeeReserveIncreased(_token, fee);
     }
 
     function _amountAfterFeeFlat(
         address _token,
         uint256 _amount
     ) private view returns (uint256) {
-        uint256 flatAmount = _adjustDecimalToToken(_token, defaultFeeFlatAmount);
+        uint256 flatAmount = _adjustDecimalToToken(
+            _token,
+            defaultFeeFlatAmount
+        );
         return _amount.sub(flatAmount);
     }
 

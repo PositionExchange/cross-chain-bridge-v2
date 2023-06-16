@@ -11,14 +11,14 @@ export const POSI: MultiChainToken = {
   symbol: "POSI",
   config: {
     97: {
-      address: "0xdc65C05EBd90B599170CE07d7d7B80d902B327d7",
+      address: "0x09669dF289c10b89d03E14B84839c2d7776D509E",
       decimals: 18,
       minTransferAmount: BigNumber.from("1000000000000000000"),
       processMethod: 2,
       collectFeeMethod: 4,
     },
     421613: {
-      address: "0x6056ff044c1e72cbd2074bD7D5A6B0C1352a3A18",
+      address: "0xDFBfDb23B598F0F4335A98c19B5A8335ca882Ea2",
       decimals: 8,
       minTransferAmount: BigNumber.from("100000000"),
       processMethod: 1,
