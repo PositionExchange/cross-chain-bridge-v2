@@ -13,8 +13,8 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "./interface/ICrossChainFunctionCall.sol";
 import "./common/NonAtomicHiddenAuthParameters.sol";
-import "./common/FeeCollector.sol";
-import "./common/TransferUtil.sol";
+import "./common/FeeTracker.sol";
+import "./common/BalanceTracker.sol";
 
 /**
  * Cross chain bridge using the Simple Function Call protocol.
@@ -25,7 +25,8 @@ contract CrossChainBridgeV2 is
     ReentrancyGuardUpgradeable,
     PausableUpgradeable,
     AccessControlUpgradeable,
-    FeeCollector
+    FeeTracker,
+    BalanceTracker
 {
     using SafeMathUpgradeable for uint256;
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -44,18 +45,18 @@ contract CrossChainBridgeV2 is
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant REFUNDER_ROLE = keccak256("REFUNDER_ROLE");
-
-    // @Deprecated: Remove this when deploy a new contract.
-    address public constant NATIVE_COIN_ADDRESS =
-        0x0000000000000000000000000000000000000001;
+    bytes32 public constant FEE_COLLECTOR_ROLE =
+        keccak256("FEE_COLLECTOR_ROLE");
 
     uint256 public myBcId;
 
-    // Simple Function Call bridge.
     ICrossChainFunctionCall public crossChainControl;
 
     // Addresses of bridges on other blockchains.
     mapping(uint256 => address) public remoteBridges;
+
+    // Addresses of bridges on other blockchains.
+    mapping(address => uint256) public feeReserves;
 
     // ***************************************************************************
     // ******* Token configuration below here ************************************
@@ -85,6 +86,20 @@ contract CrossChainBridgeV2 is
     //
     // Map (token address on this blockchain => minimum transfer amount)
     mapping(address => uint256) public tokenMinimumTransferAmount;
+
+    // Mapping of token address on this blockchain and it's corresponding decimals
+    //
+    // Map (token address on this blockchain => decimals)
+    mapping(address => uint256) public _tokenDecimals;
+
+    // Mapping of token address on this blockchain and collect fee method
+    //
+    // Map (token address on this blockchain => minimum transfer amount)
+    mapping(address => CollectFeeMethod) private _tokenCollectFeeMethod;
+
+    // TODO: Config for tokens
+    uint256 public defaultFeePercentage;
+    uint256 public defaultFeeFlatAmount;
 
     /**
      * Indicates a request to transfer some tokens has occurred on this blockchain.
@@ -173,6 +188,23 @@ contract CrossChainBridgeV2 is
     event MigratedTo(address token, address newContract, uint256 amount);
 
     /**
+     * Indicates an amount has been added to fee reserves on this blockchain.
+     *
+     * @param token              Token address from this blockchain.
+     * @param amount             Fee amount collected, and transfer to FeeTracker contract.
+     */
+    event FeeCollected(address token, uint256 amount);
+
+    /**
+     * Indicates an amount has been added to fee reserves on this blockchain.
+     *
+     * @param token              Token address from this blockchain.
+     * @param recipient          Recipient from this blockchain.
+     * @param amount             Fee amount collected, and transfer to FeeTracker contract.
+     */
+    event FeeWithdrawn(address token, address recipient, uint256 amount);
+
+    /**
      * Initialize the contract.
      *
      * @param _crossChainControl    Simple Function Call protocol implementation.
@@ -183,7 +215,6 @@ contract CrossChainBridgeV2 is
     function initialize(
         uint256 _myBcId,
         address _crossChainControl,
-        address _feeTracker,
         address _operator,
         address _pauser,
         address _refunder
@@ -200,8 +231,6 @@ contract CrossChainBridgeV2 is
         _setupRole(REFUNDER_ROLE, _refunder);
 
         crossChainControl = ICrossChainFunctionCall(_crossChainControl);
-
-        feeTracker = _feeTracker;
 
         // 1%
         defaultFeePercentage = 990;
@@ -241,7 +270,7 @@ contract CrossChainBridgeV2 is
             "POSI Bridge: Token not transferable to requested blockchain"
         );
 
-        if (TransferUtil._isNativeCoin(_srcToken)) {
+        if (_isNativeCoin(_srcToken)) {
             _validate(msg.value == _amount, "POSI Bridge: Incorrect amount");
         }
 
@@ -355,8 +384,41 @@ contract CrossChainBridgeV2 is
         return remoteBridges[_bcId];
     }
 
+    function feePercentage(
+        address /* _token */
+    ) public view override returns (uint256) {
+        return defaultFeePercentage;
+    }
+
+    function flatFeeAmount(
+        address /* _token */
+    ) public view override returns (uint256) {
+        return defaultFeeFlatAmount;
+    }
+
+    function tokenDecimals(
+        address _token
+    ) public view override returns (uint256) {
+        return _tokenDecimals[_token];
+    }
+
+    function tokenCollectFeeMethod(
+        address _token
+    ) public view override returns (CollectFeeMethod) {
+        return _tokenCollectFeeMethod[_token];
+    }
+
+    function availableBalance(
+        address _token
+    ) public view override returns (uint256) {
+        uint256 balance = _isNativeCoin(_token)
+            ? address(this).balance
+            : IERC20Upgradeable(_token).balanceOf(address(this));
+        return balance.sub(feeReserves[_token]);
+    }
+
     // ***************************************************************************
-    // ******* Only Owner below here *********************************************
+    // ******* Only Role below here *********************************************
     // ***************************************************************************
     /**
 
@@ -496,20 +558,6 @@ contract CrossChainBridgeV2 is
     }
 
     /**
-     * Update fee tracker contract
-     *
-     * Requirements:
-     * - the caller must have the `OPERATOR_ROLE`.
-     *
-     * @param _feeTracker          Address of fee tracker contract
-     */
-    function updateFeeTracker(
-        address _feeTracker
-    ) external onlyRole(OPERATOR_ROLE) {
-        feeTracker = _feeTracker;
-    }
-
-    /**
      * Transfer any amount of any to anyone. This is needed to provide refunds to
      * customers who have had failed transactions where the token transfer occurred on this
      * blockchain, but did not happen on the destination blockchain.
@@ -533,6 +581,26 @@ contract CrossChainBridgeV2 is
     ) external onlyRole(REFUNDER_ROLE) {
         //        _amount = _transferOrMint(_token, _recipient, _amount);
         //        emit Refunded(_token, _recipient, _amount);
+    }
+
+    /**
+     * Transfer all fee reserved for specific token to the fee collector.
+     *
+     * Requirements:
+     * - the caller must have the `FEE_COLLECTOR_ROLE`.
+     *
+     * @param _token    Token to transfer.
+     * @param _recipient        Address to transfer the tokens to.
+     */
+    function withdrawFee(
+        address _token,
+        address _recipient
+    ) external onlyRole(FEE_COLLECTOR_ROLE) {
+        uint256 amount = feeReserves[_token];
+        feeReserves[_token] = 0;
+
+        _withdraw(_token, _recipient, amount);
+        emit FeeWithdrawn(_token, _recipient, amount);
     }
 
     // ***************************************************************************
@@ -560,7 +628,7 @@ contract CrossChainBridgeV2 is
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
-            TransferUtil._out(_token, _recipient, _amount);
+            _transferOut(_token, _recipient, _amount);
         } else {
             ERC20PresetMinterPauserUpgradeable(_token).mint(
                 _recipient,
@@ -591,13 +659,21 @@ contract CrossChainBridgeV2 is
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
-            TransferUtil._in(_token, _spender, _amount);
+            _transferIn(_token, _spender, _amount);
         } else {
             ERC20PresetMinterPauserUpgradeable(_token).burnFrom(
                 _spender,
                 _amount
             );
         }
+    }
+
+    function _increaseFeeReserves(
+        address _token,
+        uint256 _amount
+    ) internal override {
+        feeReserves[_token] += _amount;
+        emit FeeCollected(_token, _amount);
     }
 
     function _tokenExists(address _token) private view returns (bool) {
@@ -611,10 +687,10 @@ contract CrossChainBridgeV2 is
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) private {
-        tokenDecimals[_token] = _decimals;
+        _tokenDecimals[_token] = _decimals;
         tokenMinimumTransferAmount[_token] = _minTransferAmount;
         tokenProcessMethods[_token] = _processMethod;
-        tokenCollectFeeMethod[_token] = _collectFeeMethod;
+        _tokenCollectFeeMethod[_token] = _collectFeeMethod;
 
         emit TokenConfigUpdated(
             _token,

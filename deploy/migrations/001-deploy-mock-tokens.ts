@@ -24,6 +24,7 @@ const tokenConfig: { [chainId: number]: DeployMockTokenParams } = {
 const migrations: MigrationDefinition = {
   getTasks: (ctx: MigrationContext) => ({
     "deploy mock tokens": async () => {
+      if (ctx.stage != "test") return;
       const chainId: number = ctx.hre.network.config.chainId || 0;
       await ctx.factory.deployMockToken(tokenConfig[chainId]);
     },

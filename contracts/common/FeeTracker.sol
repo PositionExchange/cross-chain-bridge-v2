@@ -6,24 +6,9 @@ pragma solidity >=0.8;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "../interface/ICrossChainVerifier.sol";
-import "./TransferUtil.sol";
 
-abstract contract FeeCollector {
+abstract contract FeeTracker {
     using SafeMathUpgradeable for uint256;
-
-    address public feeTracker;
-    uint256 public defaultFeePercentage;
-    uint256 public defaultFeeFlatAmount;
-
-    // Mapping of token address on this blockchain and it's corresponding decimals
-    //
-    // Map (token address on this blockchain => decimals)
-    mapping(address => uint256) public tokenDecimals;
-
-    // Mapping of token address on this blockchain and collect fee method
-    //
-    // Map (token address on this blockchain => minimum transfer amount)
-    mapping(address => CollectFeeMethod) public tokenCollectFeeMethod;
 
     enum CollectFeeMethod {
         // Token does not required fee.
@@ -38,19 +23,27 @@ abstract contract FeeCollector {
         RFI_N_PERCENTAGE
     }
 
-    /**
-     * Indicates an amount has been added to fee reserves on this blockchain.
-     *
-     * @param token              Token address from this blockchain.
-     * @param amount             Fee amount collected, and transfer to FeeTracker contract.
-     */
-    event FeeReserveIncreased(address token, uint256 amount);
+    function feePercentage(
+        address _token
+    ) public view virtual returns (uint256);
+
+    function flatFeeAmount(
+        address _token
+    ) public view virtual returns (uint256);
+
+    function tokenDecimals(
+        address _token
+    ) public view virtual returns (uint256);
+
+    function tokenCollectFeeMethod(
+        address _token
+    ) public view virtual returns (CollectFeeMethod);
 
     function _collectFee(
         address _token,
         uint256 _amount
     ) internal returns (uint256, uint256) {
-        CollectFeeMethod method = tokenCollectFeeMethod[_token];
+        CollectFeeMethod method = tokenCollectFeeMethod(_token);
         uint256 amountAfterFee = _amount;
 
         if (
@@ -71,7 +64,7 @@ abstract contract FeeCollector {
             method == CollectFeeMethod.PERCENTAGE ||
             method == CollectFeeMethod.RFI_N_PERCENTAGE
         ) {
-            amountAfterFee = _amountAfterFeePercent(amountAfterFee);
+            amountAfterFee = _amountAfterFeePercent(_token, amountAfterFee);
         }
 
         uint256 fee = _amount.sub(amountAfterFee);
@@ -83,26 +76,23 @@ abstract contract FeeCollector {
     function _increaseFeeReserves(
         address _token,
         uint256 _amount
-    ) private {
-        TransferUtil._out(_token, feeTracker, fee);
-        emit FeeReserveIncreased(_token, fee);
-    }
+    ) internal virtual;
 
     function _amountAfterFeeFlat(
         address _token,
         uint256 _amount
     ) private view returns (uint256) {
-        uint256 flatAmount = _adjustDecimalToToken(
-            _token,
-            defaultFeeFlatAmount
-        );
+        uint256 feeAmount = flatFeeAmount(_token);
+        uint256 flatAmount = _adjustDecimalToToken(_token, feeAmount);
         return _amount.sub(flatAmount);
     }
 
     function _amountAfterFeePercent(
+        address _token,
         uint256 _amount
     ) private view returns (uint256) {
-        return _amount.mul(defaultFeePercentage).div(1000);
+        uint256 percent = feePercentage(_token);
+        return _amount.mul(percent).div(1000);
     }
 
     function _amountAfterRFI(uint256 _amount) private pure returns (uint256) {
@@ -115,7 +105,7 @@ abstract contract FeeCollector {
         uint256 _amount
     ) private view returns (uint256) {
         uint256 fromDecimal = 18;
-        uint256 toDecimal = tokenDecimals[_token];
+        uint256 toDecimal = tokenDecimals(_token);
         return _amount.mul(10 ** fromDecimal).div(10 ** toDecimal);
     }
 }
