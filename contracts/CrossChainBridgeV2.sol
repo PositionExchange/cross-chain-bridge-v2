@@ -279,13 +279,13 @@ contract CrossChainBridgeV2 is
             "POSI Bridge: Amount below minimum transfer amount"
         );
 
-        (uint256 amountAfterFee, ) = _collectFee(_srcToken, _amount);
-        _validate(amountAfterFee > 0, "POSI Bridge: Amount after fee is zero");
-
         // Transfer tokens from the user to this contract.
         // The transfer will revert if the account has inadequate balance or if adequate
         // allowance hasn't been set-up.
-        _transferOrBurn(_srcToken, msg.sender, amountAfterFee);
+        _transferOrBurn(_srcToken, msg.sender, _amount);
+
+        (uint256 amountAfterFee, ) = _collectFee(_srcToken, _amount);
+        _validate(amountAfterFee > 0, "POSI Bridge: Amount after fee is zero");
 
         crossChainControl.crossBlockchainCall(
             _destBcId,

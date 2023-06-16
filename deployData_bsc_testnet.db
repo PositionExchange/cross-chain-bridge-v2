@@ -3,6 +3,6 @@
 {"address":"0x49A86c2A5C481940bd3Db0bC9a09831eEc4D3AFC","key":"PrimarySignatureVerifier","_id":"T8t4QgQGQNSEOsyI"}
 {"address":"0x09669dF289c10b89d03E14B84839c2d7776D509E","key":"MockToken::POSI","_id":"VJadfE48KoaHtj0m"}
 {"address":"0xA4d8982ebDaba7fE1d09b06985FD623928A97d3F","key":"CrossChainControl","_id":"YpgVHq7XPDP2XNet"}
-{"address":"0x5d0EB0200b47fA4B498490D2CB29644566b895Fc","key":"CrossChainBridgeV2:impl","_id":"aIMhH30ekHvy4tgU"}
+{"address":"0x37F0229ADd33394351Be485d9972D292F97603B9","key":"CrossChainBridgeV2:impl","_id":"aIMhH30ekHvy4tgU"}
 {"address":"0x0CFA0c9601aE636Dd808E6eE76e3B16DaF5Ac753","key":"PrimarySignatureVerifier:impl","_id":"cxADXVXdfwAsSCkS"}
 {"address":"0xc9Ae487A8e0c452b9F2416B93C7aB3F4C434b444","key":"MockToken::POSI:impl","_id":"ssyL8IPzRO8KSO6t"}
