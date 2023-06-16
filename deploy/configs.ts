@@ -22,7 +22,7 @@ export const POSI: MultiChainToken = {
     421613: {
       address: "0xD55F32ac00Ef30Dec2fcE4D778468a88a45AC5bc",
       decimals: 8,
-      minTransferAmount: BigNumber.from("500000000"),
+      minTransferAmount: BigNumber.from("5000000000000000000"),
       feePercentage: 999, // 0.1%
       feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
       processMethod: 1,
@@ -48,12 +48,12 @@ export const BridgeConfigs: {
       {
         chainId: 421613,
         supportTokens: [POSI],
-        remoteBridge: "0x95d9DD3678089d414A5fe6fB72F058ce080aE244",
+        remoteBridge: "0xf60529ce24A785F532f2E00015CF174Ce1e1E98A",
       },
       {
         chainId: 910000,
         supportTokens: [POSI],
-        remoteBridge: "0x15f0c29B339B3042eb906dF25e02c04Db0020D3A",
+        remoteBridge: "0xBA31a987e3eD0A8170CB14D164ecE5D75fb9D563",
       },
     ],
   },
@@ -62,12 +62,12 @@ export const BridgeConfigs: {
       {
         chainId: 97,
         supportTokens: [POSI],
-        remoteBridge: "0x3142977a1C50d29d6C2d4388F7BfeD5c29A2aC05",
+        remoteBridge: "0xe6ECcE0295ED15f4f3D181111fE58b30eF5553C6",
       },
       {
         chainId: 910000,
         supportTokens: [POSI],
-        remoteBridge: "0x15f0c29B339B3042eb906dF25e02c04Db0020D3A",
+        remoteBridge: "0xBA31a987e3eD0A8170CB14D164ecE5D75fb9D563",
       },
     ],
   },
@@ -76,12 +76,12 @@ export const BridgeConfigs: {
       {
         chainId: 97,
         supportTokens: [POSI],
-        remoteBridge: "0x3142977a1C50d29d6C2d4388F7BfeD5c29A2aC05",
+        remoteBridge: "0xe6ECcE0295ED15f4f3D181111fE58b30eF5553C6",
       },
       {
         chainId: 421613,
         supportTokens: [POSI],
-        remoteBridge: "0x95d9DD3678089d414A5fe6fB72F058ce080aE244",
+        remoteBridge: "0xf60529ce24A785F532f2E00015CF174Ce1e1E98A",
       },
     ],
   },

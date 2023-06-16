@@ -18,7 +18,7 @@ const tokenConfig: { [chainId: number]: DeployMockTokenParams } = {
     symbol: "POSI",
     decimal: 8,
     isRFI: false,
-    minter: "0x95d9DD3678089d414A5fe6fB72F058ce080aE244",
+    minter: "0xf60529ce24A785F532f2E00015CF174Ce1e1E98A",
   },
 };
 

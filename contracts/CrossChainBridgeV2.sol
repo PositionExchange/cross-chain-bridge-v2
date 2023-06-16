@@ -89,7 +89,7 @@ contract CrossChainBridgeV2 is
     // Mapping of token address on this blockchain and it's corresponding decimals
     //
     // Map (token address on this blockchain => decimals)
-    mapping(address => uint256) private _tokenDecimals;
+    mapping(address => uint256) public tokenDecimals;
 
     // Mapping of token address on this blockchain and collect fee method
     //
@@ -395,12 +395,6 @@ contract CrossChainBridgeV2 is
         return tokenFeeFlatAmount[_token];
     }
 
-    function tokenDecimals(
-        address _token
-    ) public view override returns (uint256) {
-        return _tokenDecimals[_token];
-    }
-
     function tokenCollectFeeMethod(
         address _token
     ) public view override returns (CollectFeeMethod) {
@@ -610,6 +604,26 @@ contract CrossChainBridgeV2 is
         emit FeeWithdrawn(_token, _recipient, amount);
     }
 
+    // Convert 10^18 ---> 10^decimals
+    function adjustWeiToTokenDecimal(
+        address _token,
+        uint256 _amount
+    ) public view returns (uint256) {
+        uint256 fromDecimal = tokenDecimals[_token];
+        uint256 toDecimal = 18;
+        return _amount.mul(10 ** fromDecimal).div(10 ** toDecimal);
+    }
+
+    // Convert 10^decimals ---> 10^18
+    function adjustTokenToWeiDecimal(
+        address _token,
+        uint256 _amount
+    ) public view returns (uint256) {
+        uint256 fromDecimal = 18;
+        uint256 toDecimal = tokenDecimals[_token];
+        return _amount.mul(10 ** fromDecimal).div(10 ** toDecimal);
+    }
+
     // ***************************************************************************
     // ******* Internal below here ***********************************************
     // ***************************************************************************
@@ -632,6 +646,7 @@ contract CrossChainBridgeV2 is
         address _recipient,
         uint256 _amount
     ) private {
+        _amount = adjustWeiToTokenDecimal(_token, _amount);
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
@@ -663,6 +678,7 @@ contract CrossChainBridgeV2 is
         address _spender,
         uint256 _amount
     ) private {
+        _amount = adjustWeiToTokenDecimal(_token, _amount);
         if (
             tokenProcessMethods[_token] == TokenProcessMethod.MASS_CONSERVATION
         ) {
@@ -696,7 +712,7 @@ contract CrossChainBridgeV2 is
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) private {
-        _tokenDecimals[_token] = _decimals;
+        tokenDecimals[_token] = _decimals;
         tokenMinimumTransferAmount[_token] = _minTransferAmount;
         tokenFeePercentage[_token] = _feePercentage;
         tokenFeeFlatAmount[_token] = _feeFlatAmount;

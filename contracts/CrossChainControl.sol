@@ -56,7 +56,8 @@ contract CrossChainControl is
         bytes destFunctionCall
     );
 
-    event CallFailure(bytes32 txId, string revertReason);
+    event CallSucceed(bytes32 txId);
+    event CallFailed(bytes32 txId, string revertReason);
 
     /**
      * @param _myBcId Blockchain identifier of this blockchain.
@@ -165,10 +166,7 @@ contract CrossChainControl is
         require(timestamp + timeHorizon > block.timestamp, "Event is too old");
         replayPrevention[txId] = timestamp;
 
-        require(
-            destBcId == myBcId,
-            "Incorrect destination blockchain id"
-        );
+        require(destBcId == myBcId, "Incorrect destination blockchain id");
 
         // Add authentication information to the function call.
         bytes memory functionCallWithAuth = encodeNonAtomicAuthParams(
@@ -182,9 +180,6 @@ contract CrossChainControl is
         (isSuccess, returnValueEncoded) = destContract.call(
             functionCallWithAuth
         );
-
-        if (!isSuccess) {
-            emit CallFailure(txId, getRevertMsg(returnValueEncoded));
-        }
+        require(isSuccess, getRevertMsg(returnValueEncoded));
     }
 }

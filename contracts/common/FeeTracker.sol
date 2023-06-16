@@ -31,10 +31,6 @@ abstract contract FeeTracker {
         address _token
     ) public view virtual returns (uint256);
 
-    function tokenDecimals(
-        address _token
-    ) public view virtual returns (uint256);
-
     function tokenCollectFeeMethod(
         address _token
     ) public view virtual returns (CollectFeeMethod);
@@ -83,8 +79,7 @@ abstract contract FeeTracker {
         uint256 _amount
     ) private view returns (uint256) {
         uint256 feeAmount = flatFeeAmount(_token);
-        uint256 flatAmount = _adjustDecimalToToken(_token, feeAmount);
-        return _amount.sub(flatAmount);
+        return _amount.sub(feeAmount);
     }
 
     function _amountAfterFeePercent(
@@ -97,15 +92,5 @@ abstract contract FeeTracker {
 
     function _amountAfterRFI(uint256 _amount) private pure returns (uint256) {
         return _amount.mul(99).div(100);
-    }
-
-    // Convert 10^18 ---> 10^decimals
-    function _adjustDecimalToToken(
-        address _token,
-        uint256 _amount
-    ) private view returns (uint256) {
-        uint256 fromDecimal = 18;
-        uint256 toDecimal = tokenDecimals(_token);
-        return _amount.mul(10 ** fromDecimal).div(10 ** toDecimal);
     }
 }
