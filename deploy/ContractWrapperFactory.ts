@@ -20,8 +20,13 @@ export class ContractWrapperFactory {
     this.defender = hre.defender;
   }
 
-  async getDeployedContract<T>(contractName: string): Promise<T> {
-    const address = await this.db.findAddressByKey(contractName);
+  async getDeployedContract<T>(
+    contractName: string,
+    contractId?: string
+  ): Promise<T> {
+    const address = await this.db.findAddressByKey(
+      contractId ? contractId : contractName
+    );
     if (!address) throw new Error(`Contract ${contractName} not found`);
 
     console.log(`ID: ${contractName} Address: ${address}`);

@@ -3,6 +3,7 @@ import {
   MigrationContext,
   MigrationDefinition,
 } from "../types";
+import { MockToken } from "../../typeChain";
 
 const tokenConfig: { [chainId: number]: DeployMockTokenParams } = {
   97: {
@@ -17,7 +18,7 @@ const tokenConfig: { [chainId: number]: DeployMockTokenParams } = {
     symbol: "POSI",
     decimal: 8,
     isRFI: false,
-    minter: "0x126e25C57eC2567368Cc1405f2662622E1e58E29",
+    minter: "0x95d9DD3678089d414A5fe6fB72F058ce080aE244",
   },
 };
 
@@ -27,6 +28,18 @@ const migrations: MigrationDefinition = {
       if (ctx.stage != "test") return;
       const chainId: number = ctx.hre.network.config.chainId || 0;
       await ctx.factory.deployMockToken(tokenConfig[chainId]);
+    },
+
+    "update minter mock tocken": async () => {
+      if (ctx.stage != "test") return;
+      const chainId: number = ctx.hre.network.config.chainId || 0;
+      const tokenContract = await ctx.factory.getDeployedContract<MockToken>(
+        "MockToken",
+        `MockToken::${tokenConfig[chainId].name}`
+      );
+
+      const tx = tokenContract.updateMinter(tokenConfig[chainId].minter);
+      await ctx.factory.waitTx(tx, "tokenContract.updateMinter")
     },
   }),
 };

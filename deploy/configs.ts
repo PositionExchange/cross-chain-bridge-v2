@@ -20,7 +20,7 @@ export const POSI: MultiChainToken = {
       collectFeeMethod: 4,
     },
     421613: {
-      address: "0xDFBfDb23B598F0F4335A98c19B5A8335ca882Ea2",
+      address: "0xD55F32ac00Ef30Dec2fcE4D778468a88a45AC5bc",
       decimals: 8,
       minTransferAmount: BigNumber.from("500000000"),
       feePercentage: 999, // 0.1%
@@ -48,12 +48,12 @@ export const BridgeConfigs: {
       {
         chainId: 421613,
         supportTokens: [POSI],
-        remoteBridge: "0x126e25C57eC2567368Cc1405f2662622E1e58E29",
+        remoteBridge: "0x95d9DD3678089d414A5fe6fB72F058ce080aE244",
       },
       {
         chainId: 910000,
         supportTokens: [POSI],
-        remoteBridge: "0x3632Ae704CC6325f8545c92BD8e09Af952943677",
+        remoteBridge: "0x15f0c29B339B3042eb906dF25e02c04Db0020D3A",
       },
     ],
   },
@@ -62,12 +62,12 @@ export const BridgeConfigs: {
       {
         chainId: 97,
         supportTokens: [POSI],
-        remoteBridge: "0xB288923F130C64fDcE646c7d37a342f164A2DCc8",
+        remoteBridge: "0x3142977a1C50d29d6C2d4388F7BfeD5c29A2aC05",
       },
       {
         chainId: 910000,
         supportTokens: [POSI],
-        remoteBridge: "0x3632Ae704CC6325f8545c92BD8e09Af952943677",
+        remoteBridge: "0x15f0c29B339B3042eb906dF25e02c04Db0020D3A",
       },
     ],
   },
@@ -76,12 +76,12 @@ export const BridgeConfigs: {
       {
         chainId: 97,
         supportTokens: [POSI],
-        remoteBridge: "0xB288923F130C64fDcE646c7d37a342f164A2DCc8",
+        remoteBridge: "0x3142977a1C50d29d6C2d4388F7BfeD5c29A2aC05",
       },
       {
         chainId: 421613,
         supportTokens: [POSI],
-        remoteBridge: "0x126e25C57eC2567368Cc1405f2662622E1e58E29",
+        remoteBridge: "0x95d9DD3678089d414A5fe6fB72F058ce080aE244",
       },
     ],
   },
@@ -94,13 +94,13 @@ export const CBCConfigs: {
     supportChains: [
       {
         chainId: 421613,
-        destCrossChainControl: "0xe7011A188A8453CDF846d2C9d5D8eaF3297DBBA2",
-        verifier: "0xa5Beb85D35504F4699EC4B36e0781F4eD939C4C1",
+        destCrossChainControl: "0x9Dc19290B7d4F9333A2bE7f8A34A5Ea9D70AaDE8",
+        verifier: "0x49A86c2A5C481940bd3Db0bC9a09831eEc4D3AFC",
       },
       {
         chainId: 910000,
-        destCrossChainControl: "0x94a0D851E786C9469664c90D5CE31e9953Cf2b20",
-        verifier: "0xa5Beb85D35504F4699EC4B36e0781F4eD939C4C1",
+        destCrossChainControl: "0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e",
+        verifier: "0x49A86c2A5C481940bd3Db0bC9a09831eEc4D3AFC",
       },
     ],
   },
@@ -108,13 +108,13 @@ export const CBCConfigs: {
     supportChains: [
       {
         chainId: 97,
-        destCrossChainControl: "0x11975F8FCBF9ED95b45c66F5934431d6356Cee9a",
-        verifier: "0x04F76D826596BE89AE7C0D477D0aB6AFB9D61269",
+        destCrossChainControl: "0xA4d8982ebDaba7fE1d09b06985FD623928A97d3F",
+        verifier: "0xD5814BDe813266e56cd0680513B4f4029F57DD3b",
       },
       {
         chainId: 910000,
-        destCrossChainControl: "0x94a0D851E786C9469664c90D5CE31e9953Cf2b20",
-        verifier: "0x04F76D826596BE89AE7C0D477D0aB6AFB9D61269",
+        destCrossChainControl: "0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e",
+        verifier: "0xD5814BDe813266e56cd0680513B4f4029F57DD3b",
       },
     ],
   },
@@ -122,13 +122,13 @@ export const CBCConfigs: {
     supportChains: [
       {
         chainId: 97,
-        destCrossChainControl: "0x11975F8FCBF9ED95b45c66F5934431d6356Cee9a",
-        verifier: "0xe9376B3a5101EeCb50c50D5b56e72F0Cca986D28",
+        destCrossChainControl: "0xA4d8982ebDaba7fE1d09b06985FD623928A97d3F",
+        verifier: "0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e",
       },
       {
         chainId: 421613,
-        destCrossChainControl: "0xe7011A188A8453CDF846d2C9d5D8eaF3297DBBA2",
-        verifier: "0xe9376B3a5101EeCb50c50D5b56e72F0Cca986D28",
+        destCrossChainControl: "0x9Dc19290B7d4F9333A2bE7f8A34A5Ea9D70AaDE8",
+        verifier: "0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e",
       },
     ],
   },

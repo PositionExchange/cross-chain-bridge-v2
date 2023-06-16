@@ -36,4 +36,8 @@ contract MockToken is ERC20BurnableUpgradeable {
     function decimals() public view override returns (uint8) {
         return _decimal;
     }
+
+    function updateMinter(address _address) external {
+        minter = _address;
+    }
 }
