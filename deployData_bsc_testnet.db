@@ -1,8 +1,10 @@
 {"address":"0xDC3C471dD3BB0319549683e3CE95fc0419AFE1c6","key":"CrossChainControl:impl","_id":"1mvEz0g6qxfNoOMy"}
 {"address":"0x3142977a1C50d29d6C2d4388F7BfeD5c29A2aC05","key":"CrossChainBridgeV2","_id":"9kX4LUVJeGRWkS0m"}
 {"address":"0x49A86c2A5C481940bd3Db0bC9a09831eEc4D3AFC","key":"PrimarySignatureVerifier","_id":"T8t4QgQGQNSEOsyI"}
-{"address":"0x09669dF289c10b89d03E14B84839c2d7776D509E","key":"MockToken::POSI","_id":"VJadfE48KoaHtj0m"}
+{"address":"0xa6604e46B745A5Ff366EBdA53Bb602Fb3E8DF6ff","key":"MockToken::POSI","_id":"VJadfE48KoaHtj0m"}
 {"address":"0xA4d8982ebDaba7fE1d09b06985FD623928A97d3F","key":"CrossChainControl","_id":"YpgVHq7XPDP2XNet"}
 {"address":"0x37F0229ADd33394351Be485d9972D292F97603B9","key":"CrossChainBridgeV2:impl","_id":"aIMhH30ekHvy4tgU"}
 {"address":"0x0CFA0c9601aE636Dd808E6eE76e3B16DaF5Ac753","key":"PrimarySignatureVerifier:impl","_id":"cxADXVXdfwAsSCkS"}
-{"address":"0xc9Ae487A8e0c452b9F2416B93C7aB3F4C434b444","key":"MockToken::POSI:impl","_id":"ssyL8IPzRO8KSO6t"}
+{"address":"0xb7FD1bA2f4EBE17Ea7E8185118468149aff112e9","key":"MockToken::POSI:impl","_id":"ssyL8IPzRO8KSO6t"}
+{"address":"0xf3193f9602d49E779e2f0d75e9E211AB73Eb35f3","key":"MockToken::POSI","_id":"VJadfE48KoaHtj0m"}
+{"address":"0x52DA501cf04bD7029bDC38efF36fe85b665e7023","key":"MockToken::POSI:impl","_id":"ssyL8IPzRO8KSO6t"}

@@ -36,18 +36,4 @@ contract MockToken is ERC20BurnableUpgradeable {
     function decimals() public view override returns (uint8) {
         return _decimal;
     }
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override {
-        super._beforeTokenTransfer(from, to, amount);
-
-        if (isRFI || from == address(0) || to == address(0)) {
-            return;
-        }
-
-        amount = (amount * 99) / 100;
-    }
 }
