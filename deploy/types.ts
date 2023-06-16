@@ -33,6 +33,8 @@ export interface Token {
   address: string;
   decimals: number;
   minTransferAmount: BigNumber;
+  feePercentage: number;
+  feeFlatAmount: BigNumber;
   processMethod: number;
   collectFeeMethod: number;
 }

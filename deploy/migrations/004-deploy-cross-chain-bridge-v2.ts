@@ -55,11 +55,11 @@ const migrations: MigrationDefinition = {
         const destChainId = destChain.chainId;
         const destBridge = destChain.remoteBridge;
 
-        // tx = crossChainBridgeV2.updateBridgeMapping(destChainId, destBridge);
-        // await ctx.factory.waitTx(
-        //   tx,
-        //   `crossChainBridgeV2.updateBridgeMapping config chain ${destChainId} to bridge ${destBridge}`
-        // );
+        tx = crossChainBridgeV2.updateBridgeMapping(destChainId, destBridge);
+        await ctx.factory.waitTx(
+          tx,
+          `crossChainBridgeV2.updateBridgeMapping config chain ${destChainId} to bridge ${destBridge}`
+        );
 
         for (const token: MultiChainToken of destChain.supportTokens) {
           const srcToken: Token = token.config[srcChainId];
@@ -71,6 +71,8 @@ const migrations: MigrationDefinition = {
             destTokenAddress,
             srcToken.decimals,
             srcToken.minTransferAmount,
+            srcToken.feePercentage,
+            srcToken.feeFlatAmount,
             srcToken.processMethod,
             srcToken.collectFeeMethod
           );

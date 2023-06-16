@@ -42,15 +42,14 @@ contract CrossChainBridgeV2 is
         MASS_CONSERVATION
     }
 
-    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    bytes32 public constant REFUNDER_ROLE = keccak256("REFUNDER_ROLE");
-    bytes32 public constant FEE_COLLECTOR_ROLE =
-        keccak256("FEE_COLLECTOR_ROLE");
-
-    uint256 public myBcId;
+    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER");
+    bytes32 public constant REFUNDER_ROLE = keccak256("REFUNDER");
+    bytes32 public constant FEE_COLLECTOR_ROLE = keccak256("FEE_COLLECTOR");
 
     ICrossChainFunctionCall public crossChainControl;
+
+    uint256 public myBcId;
 
     // Addresses of bridges on other blockchains.
     mapping(uint256 => address) public remoteBridges;
@@ -90,16 +89,22 @@ contract CrossChainBridgeV2 is
     // Mapping of token address on this blockchain and it's corresponding decimals
     //
     // Map (token address on this blockchain => decimals)
-    mapping(address => uint256) public _tokenDecimals;
+    mapping(address => uint256) private _tokenDecimals;
 
     // Mapping of token address on this blockchain and collect fee method
     //
     // Map (token address on this blockchain => minimum transfer amount)
     mapping(address => CollectFeeMethod) private _tokenCollectFeeMethod;
 
-    // TODO: Config for tokens
-    uint256 public defaultFeePercentage;
-    uint256 public defaultFeeFlatAmount;
+    // Mapping of token address on this blockchain and fee percentage
+    //
+    // Map (token address on this blockchain => fee percentage)
+    mapping(address => uint256) public tokenFeePercentage;
+
+    // Mapping of token address on this blockchain and flat fee amount in Wei
+    //
+    // Map (token address on this blockchain => flat fee amount)
+    mapping(address => uint256) public tokenFeeFlatAmount;
 
     /**
      * Indicates a request to transfer some tokens has occurred on this blockchain.
@@ -231,12 +236,6 @@ contract CrossChainBridgeV2 is
         _setupRole(REFUNDER_ROLE, _refunder);
 
         crossChainControl = ICrossChainFunctionCall(_crossChainControl);
-
-        // 1%
-        defaultFeePercentage = 990;
-
-        // 2 tokens, must convert to token's decimal before deduction
-        defaultFeeFlatAmount = 2 * 10 ** 18;
     }
 
     /**
@@ -385,15 +384,15 @@ contract CrossChainBridgeV2 is
     }
 
     function feePercentage(
-        address /* _token */
+        address _token
     ) public view override returns (uint256) {
-        return defaultFeePercentage;
+        return tokenFeePercentage[_token];
     }
 
     function flatFeeAmount(
-        address /* _token */
+        address _token
     ) public view override returns (uint256) {
-        return defaultFeeFlatAmount;
+        return tokenFeeFlatAmount[_token];
     }
 
     function tokenDecimals(
@@ -462,6 +461,8 @@ contract CrossChainBridgeV2 is
         address _destToken,
         uint256 _decimals,
         uint256 _minTransferAmount,
+        uint256 _feePercentage,
+        uint256 _feeFlatAmount,
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
@@ -474,6 +475,8 @@ contract CrossChainBridgeV2 is
             _srcToken,
             _decimals,
             _minTransferAmount,
+            _feePercentage,
+            _feeFlatAmount,
             _processMethod,
             _collectFeeMethod
         );
@@ -495,6 +498,8 @@ contract CrossChainBridgeV2 is
         address _srcToken,
         uint256 _decimals,
         uint256 _minTransferAmount,
+        uint256 _feePercentage,
+        uint256 _feeFlatAmount,
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
@@ -503,6 +508,8 @@ contract CrossChainBridgeV2 is
             _srcToken,
             _decimals,
             _minTransferAmount,
+            _feePercentage,
+            _feeFlatAmount,
             _processMethod,
             _collectFeeMethod
         );
@@ -684,11 +691,16 @@ contract CrossChainBridgeV2 is
         address _token,
         uint256 _decimals,
         uint256 _minTransferAmount,
+        uint256 _feePercentage,
+        uint256 _feeFlatAmount,
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) private {
         _tokenDecimals[_token] = _decimals;
         tokenMinimumTransferAmount[_token] = _minTransferAmount;
+        tokenFeePercentage[_token] = _feePercentage;
+        tokenFeeFlatAmount[_token] = _feeFlatAmount;
+
         tokenProcessMethods[_token] = _processMethod;
         _tokenCollectFeeMethod[_token] = _collectFeeMethod;
 
