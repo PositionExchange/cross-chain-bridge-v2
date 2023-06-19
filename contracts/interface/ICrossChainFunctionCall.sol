@@ -21,5 +21,5 @@ interface ICrossChainFunctionCall {
         uint256 _bcId,
         address _contract,
         bytes calldata _functionCallData
-    ) external;
+    ) external returns (bytes32);
 }

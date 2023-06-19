@@ -4,4 +4,5 @@
 {"address":"0xe6ECcE0295ED15f4f3D181111fE58b30eF5553C6","key":"CrossChainBridgeV2","_id":"XxniHCVRY1Rh0Wce"}
 {"address":"0xA4d8982ebDaba7fE1d09b06985FD623928A97d3F","key":"CrossChainControl","_id":"YpgVHq7XPDP2XNet"}
 {"address":"0x0CFA0c9601aE636Dd808E6eE76e3B16DaF5Ac753","key":"PrimarySignatureVerifier:impl","_id":"cxADXVXdfwAsSCkS"}
-{"address":"0x729C3c82d1A24Bf000918A7f17B2629a2C624AeD","key":"CrossChainBridgeV2:impl","_id":"tDlk1Y4W2RAk0UJb"}
+{"address":"0x6C60B423B23cC11918eAcDB972980Dfb5aa61c51","key":"CrossChainBridgeV2:impl","_id":"tDlk1Y4W2RAk0UJb"}
+{"address":"0xF74f26cb0bd0d0255d72CF9B08b06B14D990A643","key":"CrossChainControl:impl","_id":"1mvEz0g6qxfNoOMy"}

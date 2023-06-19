@@ -56,8 +56,7 @@ contract CrossChainControl is
         bytes destFunctionCall
     );
 
-    event CallSucceed(bytes32 txId);
-    event CallFailed(bytes32 txId, string revertReason);
+    event CallSucceed(bytes32 txId, address caller);
 
     /**
      * @param _myBcId Blockchain identifier of this blockchain.
@@ -79,9 +78,9 @@ contract CrossChainControl is
         uint256 _destBcId,
         address _destContract,
         bytes calldata _destData
-    ) external override {
+    ) external override returns (bytes32 txId) {
         txIndex++;
-        bytes32 txId = keccak256(
+        txId = keccak256(
             abi.encodePacked(
                 block.timestamp,
                 myBcId,
@@ -181,5 +180,6 @@ contract CrossChainControl is
             functionCallWithAuth
         );
         require(isSuccess, getRevertMsg(returnValueEncoded));
+        emit CallSucceed(txId, msg.sender);
     }
 }

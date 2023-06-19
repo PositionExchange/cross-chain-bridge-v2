@@ -109,6 +109,7 @@ contract CrossChainBridgeV2 is
     /**
      * Indicates a request to transfer some tokens has occurred on this blockchain.
      *
+     * @param txId               Tx ID of the transaction.
      * @param destBcId           Blockchain the tokens are being transferred to.
      * @param srcToken           Address of the token contract on this blockchain.
      * @param destToken          Address of the token contract on destination blockchain.
@@ -117,6 +118,7 @@ contract CrossChainBridgeV2 is
      * @param amount             Amount of tokens to transfer.
      */
     event TransferTo(
+        bytes32 txId,
         uint256 srcBcId,
         uint256 destBcId,
         address srcToken,
@@ -287,7 +289,7 @@ contract CrossChainBridgeV2 is
         (uint256 amountAfterFee, ) = _collectFee(_srcToken, _amount);
         _validate(amountAfterFee > 0, "POSI Bridge: Amount after fee is zero");
 
-        crossChainControl.crossBlockchainCall(
+        bytes32 txId = crossChainControl.crossBlockchainCall(
             _destBcId,
             destBridge,
             abi.encodeWithSelector(
@@ -299,6 +301,7 @@ contract CrossChainBridgeV2 is
         );
 
         emit TransferTo(
+            txId,
             myBcId,
             _destBcId,
             _srcToken,
