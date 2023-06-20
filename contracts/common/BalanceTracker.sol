@@ -53,6 +53,7 @@ abstract contract BalanceTracker {
         if (_isNativeCoin(_token)) {
             (bool sent, ) = payable(_recipient).call{value: _amount}("");
             require(sent, "Transfer native coin failed");
+            return;
         }
         IERC20Upgradeable(_token).safeTransfer(_recipient, _amount);
     }

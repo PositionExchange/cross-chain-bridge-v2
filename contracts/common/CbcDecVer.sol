@@ -8,10 +8,10 @@ import "../interface/ICrossChainVerifier.sol";
 
 abstract contract CbcDecVer is OwnableUpgradeable {
     // Address of verifier contract to be used for a certain blockchain id.
-    mapping(uint256 => ICrossChainVerifier) private verifiers;
+    mapping(uint256 => ICrossChainVerifier) public verifiers;
 
     // Address of CrossChain Control Contract on another blockchain.
-    mapping(uint256 => address) internal remoteCrossChainControlContracts;
+    mapping(uint256 => address) public remoteCrossChainControlContracts;
 
     function addVerifier(
         uint256 _blockchainId,

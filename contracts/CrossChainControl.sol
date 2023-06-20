@@ -35,7 +35,7 @@ contract CrossChainControl is
     uint256 public myBcId;
 
     // Use to determine different transactions but have same calldata, block timestamp
-    uint256 txIndex;
+    uint256 private txIndex;
 
     /**
      * Crosschain Transaction event.

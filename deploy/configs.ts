@@ -123,12 +123,12 @@ export const CBCConfigs: {
       {
         chainId: 97,
         destCrossChainControl: "0xA4d8982ebDaba7fE1d09b06985FD623928A97d3F",
-        verifier: "0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e",
+        verifier: "0xf042A1810EB328D49d4ae020933bE722B767a54f",
       },
       {
         chainId: 421613,
         destCrossChainControl: "0x9Dc19290B7d4F9333A2bE7f8A34A5Ea9D70AaDE8",
-        verifier: "0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e",
+        verifier: "0xf042A1810EB328D49d4ae020933bE722B767a54f",
       },
     ],
   },
