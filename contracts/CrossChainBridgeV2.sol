@@ -257,7 +257,7 @@ contract CrossChainBridgeV2 is
         address _srcToken,
         address _recipient,
         uint256 _amount
-    ) public payable whenNotPaused nonReentrant {
+    ) external payable whenNotPaused nonReentrant {
         address destBridge = remoteBridges[_destBcId];
         _validate(
             destBridge != address(0),
@@ -325,7 +325,7 @@ contract CrossChainBridgeV2 is
         address _destToken,
         address _recipient,
         uint256 _amount
-    ) external whenNotPaused {
+    ) external payable whenNotPaused {
         _validate(
             _msgSender() == address(crossChainControl),
             "POSI Bridge: Can not process transfers from contracts other than the bridge contract"

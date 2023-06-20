@@ -3067,7 +3067,7 @@
             "label": "crossChainControl",
             "offset": 0,
             "slot": "251",
-            "type": "t_contract(ICrossChainFunctionCall)7094",
+            "type": "t_contract(ICrossChainFunctionCall)6569",
             "contract": "CrossChainBridgeV2",
             "src": "contracts/CrossChainBridgeV2.sol:50"
           },
@@ -3131,7 +3131,7 @@
             "label": "_tokenCollectFeeMethod",
             "offset": 0,
             "slot": "259",
-            "type": "t_mapping(t_address,t_enum(CollectFeeMethod)6776)",
+            "type": "t_mapping(t_address,t_enum(CollectFeeMethod)6323)",
             "contract": "CrossChainBridgeV2",
             "src": "contracts/CrossChainBridgeV2.sol:97"
           },
@@ -3173,11 +3173,11 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
-          "t_contract(ICrossChainFunctionCall)7094": {
+          "t_contract(ICrossChainFunctionCall)6569": {
             "label": "contract ICrossChainFunctionCall",
             "numberOfBytes": "20"
           },
-          "t_enum(CollectFeeMethod)6776": {
+          "t_enum(CollectFeeMethod)6323": {
             "label": "enum FeeTracker.CollectFeeMethod",
             "members": [
               "NONE",
@@ -3201,7 +3201,7 @@
             "label": "mapping(address => bool)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_enum(CollectFeeMethod)6776)": {
+          "t_mapping(t_address,t_enum(CollectFeeMethod)6323)": {
             "label": "mapping(address => enum FeeTracker.CollectFeeMethod)",
             "numberOfBytes": "32"
           },
@@ -3386,6 +3386,284 @@
           "t_mapping(t_uint256,t_contract(ICrossChainVerifier)7128)": {
             "label": "mapping(uint256 => contract ICrossChainVerifier)",
             "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "8b8239efb22fd355f97d2d55dea2ba0db35dcb95965023a1894553273e02f82c": {
+      "address": "0x2acFaf571c764b466902c620DbA8A4390068d89B",
+      "txHash": "0x74c3b996c1bf4416bb60e5b5a1d0b842a5ceb80e59d732e25874645ea258aa3c",
+      "layout": {
+        "solcVersion": "0.8.8",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)179_storage)",
+            "contract": "AccessControlUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "AccessControlUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:260"
+          },
+          {
+            "label": "crossChainControl",
+            "offset": 0,
+            "slot": "251",
+            "type": "t_contract(ICrossChainFunctionCall)6569",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:50"
+          },
+          {
+            "label": "myBcId",
+            "offset": 0,
+            "slot": "252",
+            "type": "t_uint256",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:52"
+          },
+          {
+            "label": "remoteBridges",
+            "offset": 0,
+            "slot": "253",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:55"
+          },
+          {
+            "label": "feeReserves",
+            "offset": 0,
+            "slot": "254",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:58"
+          },
+          {
+            "label": "tokenProcessMethods",
+            "offset": 0,
+            "slot": "255",
+            "type": "t_mapping(t_address,t_enum(TokenProcessMethod)5111)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:72"
+          },
+          {
+            "label": "tokenAddressMapping",
+            "offset": 0,
+            "slot": "256",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_address))",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:79"
+          },
+          {
+            "label": "tokenMinimumTransferAmount",
+            "offset": 0,
+            "slot": "257",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:87"
+          },
+          {
+            "label": "tokenDecimals",
+            "offset": 0,
+            "slot": "258",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:92"
+          },
+          {
+            "label": "_tokenCollectFeeMethod",
+            "offset": 0,
+            "slot": "259",
+            "type": "t_mapping(t_address,t_enum(CollectFeeMethod)6323)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:97"
+          },
+          {
+            "label": "tokenFeePercentage",
+            "offset": 0,
+            "slot": "260",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:102"
+          },
+          {
+            "label": "tokenFeeFlatAmount",
+            "offset": 0,
+            "slot": "261",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CrossChainBridgeV2",
+            "src": "contracts/CrossChainBridgeV2.sol:107"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(ICrossChainFunctionCall)6569": {
+            "label": "contract ICrossChainFunctionCall",
+            "numberOfBytes": "20"
+          },
+          "t_enum(CollectFeeMethod)6323": {
+            "label": "enum FeeTracker.CollectFeeMethod",
+            "members": [
+              "NONE",
+              "FLAT",
+              "PERCENTAGE",
+              "RFI_N_FLAT",
+              "RFI_N_PERCENTAGE"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_enum(TokenProcessMethod)5111": {
+            "label": "enum CrossChainBridgeV2.TokenProcessMethod",
+            "members": [
+              "NONE",
+              "MINTER",
+              "MASS_CONSERVATION"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_enum(CollectFeeMethod)6323)": {
+            "label": "mapping(address => enum FeeTracker.CollectFeeMethod)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_enum(TokenProcessMethod)5111)": {
+            "label": "mapping(address => enum CrossChainBridgeV2.TokenProcessMethod)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_address))": {
+            "label": "mapping(address => mapping(uint256 => address))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)179_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)179_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
           },
           "t_uint256": {
             "label": "uint256",
