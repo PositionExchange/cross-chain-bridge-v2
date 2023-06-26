@@ -7,7 +7,7 @@ import {
   TokenConfig,
 } from "../types";
 import { ContractTransaction } from "ethers";
-import { BridgeConfigs } from "../configs";
+import { BridgeConfigs, POSI } from "../configs";
 
 const migrations: MigrationDefinition = {
   getTasks: (ctx: MigrationContext) => ({
@@ -73,6 +73,7 @@ const migrations: MigrationDefinition = {
             srcToken.minTransferAmount,
             srcToken.feePercentage,
             srcToken.feeFlatAmount,
+            srcToken.maxFeeAmount,
             srcToken.processMethod,
             srcToken.collectFeeMethod
           );
@@ -82,6 +83,27 @@ const migrations: MigrationDefinition = {
           );
         }
       }
+    },
+
+    "CrossChainBridgeV2.setTokenConfig": async () => {
+      const chainId: number = ctx.hre.network.config.chainId || 0;
+      const crossChainBridgeV2 = await ctx.factory.getCrossChainBridgeV2();
+
+      const posi = POSI.config[chainId];
+      const tx = crossChainBridgeV2.setTokenConfig(
+        posi.address,
+        posi.decimals,
+        posi.minTransferAmount,
+        posi.feePercentage,
+        posi.feeFlatAmount,
+        posi.maxFeeAmount,
+        posi.processMethod,
+        posi.collectFeeMethod
+      );
+      await ctx.factory.waitTx(
+        tx,
+        `CrossChainBridgeV2.setTokenConfig(POSI, ${chainId})`
+      );
     },
   }),
 };

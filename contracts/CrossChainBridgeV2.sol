@@ -106,6 +106,11 @@ contract CrossChainBridgeV2 is
     // Map (token address on this blockchain => flat fee amount)
     mapping(address => uint256) public tokenFeeFlatAmount;
 
+    // Mapping of token address on this blockchain and maximum fee amount can be collected
+    //
+    // Map (token address on this blockchain => max fee amount)
+    mapping(address => uint256) public tokenMaxFeeAmount;
+
     /**
      * Indicates a request to transfer some tokens has occurred on this blockchain.
      *
@@ -404,6 +409,12 @@ contract CrossChainBridgeV2 is
         return _tokenCollectFeeMethod[_token];
     }
 
+    function maxFeeAmount(
+        address _token
+    ) public view override returns (uint256) {
+        return tokenMaxFeeAmount[_token];
+    }
+
     function availableBalance(
         address _token
     ) public view override returns (uint256) {
@@ -460,6 +471,7 @@ contract CrossChainBridgeV2 is
         uint256 _minTransferAmount,
         uint256 _feePercentage,
         uint256 _feeFlatAmount,
+        uint256 _maxFeeAmount,
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
@@ -474,6 +486,7 @@ contract CrossChainBridgeV2 is
             _minTransferAmount,
             _feePercentage,
             _feeFlatAmount,
+            _maxFeeAmount,
             _processMethod,
             _collectFeeMethod
         );
@@ -497,6 +510,7 @@ contract CrossChainBridgeV2 is
         uint256 _minTransferAmount,
         uint256 _feePercentage,
         uint256 _feeFlatAmount,
+        uint256 _maxFeeAmount,
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) external onlyRole(OPERATOR_ROLE) {
@@ -507,6 +521,7 @@ contract CrossChainBridgeV2 is
             _minTransferAmount,
             _feePercentage,
             _feeFlatAmount,
+            _maxFeeAmount,
             _processMethod,
             _collectFeeMethod
         );
@@ -712,6 +727,7 @@ contract CrossChainBridgeV2 is
         uint256 _minTransferAmount,
         uint256 _feePercentage,
         uint256 _feeFlatAmount,
+        uint256 _maxFeeAmount,
         TokenProcessMethod _processMethod,
         CollectFeeMethod _collectFeeMethod
     ) private {
@@ -719,6 +735,7 @@ contract CrossChainBridgeV2 is
         tokenMinimumTransferAmount[_token] = _minTransferAmount;
         tokenFeePercentage[_token] = _feePercentage;
         tokenFeeFlatAmount[_token] = _feeFlatAmount;
+        tokenMaxFeeAmount[_token] = _maxFeeAmount;
 
         tokenProcessMethods[_token] = _processMethod;
         _tokenCollectFeeMethod[_token] = _collectFeeMethod;

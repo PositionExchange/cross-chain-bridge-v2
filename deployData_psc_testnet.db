@@ -2,6 +2,5 @@
 {"address":"0x91b60d839d75A7595838F9eAa78BCb07AcC9C09e","key":"CrossChainControl","_id":"LRT493v7ReY7wznM"}
 {"address":"0x0B83e9674aCaF499FE27B569aAedB0EeC3fDEeBF","key":"CrossChainControl:impl","_id":"OiemlCMstb3lfif1"}
 {"address":"0xf042A1810EB328D49d4ae020933bE722B767a54f","key":"PrimarySignatureVerifier","_id":"YxmEp5tl8r2F3QEd"}
-{"address":"0x2acFaf571c764b466902c620DbA8A4390068d89B","key":"CrossChainBridgeV2:impl","_id":"o2LxkNzfIP3fcgaG"}
+{"address":"0x0FdaD3Cac864370cC2e4a5108b87b6e5F40683E3","key":"CrossChainBridgeV2:impl","_id":"o2LxkNzfIP3fcgaG"}
 {"address":"0x4C2a2F5937a25b2F6Ac5EfA3c213ffC385343716","key":"PrimarySignatureVerifier:impl","_id":"z3Igf0NCK1vrlmWN"}
-{"address":"0xBA5a04ea817Cd2c3c13f3f87165073a415017dF0","key":"CrossChainBridgeV2:impl","_id":"o2LxkNzfIP3fcgaG"}

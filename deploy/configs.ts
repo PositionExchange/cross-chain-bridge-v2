@@ -14,28 +14,31 @@ export const POSI: MultiChainToken = {
       address: "0x09669dF289c10b89d03E14B84839c2d7776D509E",
       decimals: 18,
       minTransferAmount: BigNumber.from("5000000000000000000"),
-      feePercentage: 999, // 0.1%
+      feePercentage: 1, // 0.1%
       feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
       processMethod: 2,
       collectFeeMethod: 4,
+      maxFeeAmount: BigNumber.from("2000000000000000000"), // In Wei,
     },
     421613: {
       address: "0xD55F32ac00Ef30Dec2fcE4D778468a88a45AC5bc",
       decimals: 8,
       minTransferAmount: BigNumber.from("5000000000000000000"),
-      feePercentage: 999, // 0.1%
+      feePercentage: 1, // 0.1%
       feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
       processMethod: 1,
       collectFeeMethod: 2,
+      maxFeeAmount: BigNumber.from("2000000000000000000"), // In Wei,
     },
     910000: {
       address: "0x0000000000000000000000000000000000000001",
       decimals: 18,
       minTransferAmount: BigNumber.from("5000000000000000000"),
-      feePercentage: 999, // 0.1%
+      feePercentage: 1, // 0.1%
       feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
       processMethod: 2,
       collectFeeMethod: 2,
+      maxFeeAmount: BigNumber.from("2000000000000000000"), // In Wei,
     },
   },
 };

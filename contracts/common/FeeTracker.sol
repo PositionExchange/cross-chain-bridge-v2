@@ -23,6 +23,10 @@ abstract contract FeeTracker {
         RFI_N_PERCENTAGE
     }
 
+    function tokenCollectFeeMethod(
+        address _token
+    ) public view virtual returns (CollectFeeMethod);
+
     function feePercentage(
         address _token
     ) public view virtual returns (uint256);
@@ -31,66 +35,53 @@ abstract contract FeeTracker {
         address _token
     ) public view virtual returns (uint256);
 
-    function tokenCollectFeeMethod(
-        address _token
-    ) public view virtual returns (CollectFeeMethod);
+    function maxFeeAmount(address _token) public view virtual returns (uint256);
 
     function _collectFee(
         address _token,
         uint256 _amount
-    ) internal returns (uint256, uint256) {
+    ) internal returns (uint256 amountAfterFee, uint256 feeAmount) {
         CollectFeeMethod method = tokenCollectFeeMethod(_token);
-        uint256 amountAfterFee = _amount;
 
         if (
             method == CollectFeeMethod.RFI_N_FLAT ||
             method == CollectFeeMethod.RFI_N_PERCENTAGE
         ) {
-            amountAfterFee = _amountAfterRFI(amountAfterFee);
+            _amount = _amountAfterRFI(_amount);
         }
 
         if (
             method == CollectFeeMethod.FLAT ||
             method == CollectFeeMethod.RFI_N_FLAT
         ) {
-            amountAfterFee = _amountAfterFeeFlat(_token, amountAfterFee);
+            feeAmount = flatFeeAmount(_token);
         }
 
         if (
             method == CollectFeeMethod.PERCENTAGE ||
             method == CollectFeeMethod.RFI_N_PERCENTAGE
         ) {
-            amountAfterFee = _amountAfterFeePercent(_token, amountAfterFee);
+            uint256 percent = feePercentage(_token);
+            feeAmount = _amount.mul(percent).div(1000);
         }
 
-        uint256 fee = _amount.sub(amountAfterFee);
-        _increaseFeeReserves(_token, fee);
+        uint256 maxFee = maxFeeAmount(_token);
+        if (feeAmount > maxFee) {
+            feeAmount = maxFee;
+        }
 
-        return (amountAfterFee, fee);
+        amountAfterFee = _amount.sub(feeAmount);
+        _increaseFeeReserves(_token, feeAmount);
+
+        return (amountAfterFee, feeAmount);
+    }
+
+    function _amountAfterRFI(uint256 _amount) private pure returns (uint256) {
+        return _amount.mul(99).div(100);
     }
 
     function _increaseFeeReserves(
         address _token,
         uint256 _amount
     ) internal virtual;
-
-    function _amountAfterFeeFlat(
-        address _token,
-        uint256 _amount
-    ) private view returns (uint256) {
-        uint256 feeAmount = flatFeeAmount(_token);
-        return _amount.sub(feeAmount);
-    }
-
-    function _amountAfterFeePercent(
-        address _token,
-        uint256 _amount
-    ) private view returns (uint256) {
-        uint256 percent = feePercentage(_token);
-        return _amount.mul(percent).div(1000);
-    }
-
-    function _amountAfterRFI(uint256 _amount) private pure returns (uint256) {
-        return _amount.mul(99).div(100);
-    }
 }

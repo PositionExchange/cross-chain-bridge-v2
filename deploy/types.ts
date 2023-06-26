@@ -37,6 +37,7 @@ export interface Token {
   feeFlatAmount: BigNumber;
   processMethod: number;
   collectFeeMethod: number;
+  maxFeeAmount: BigNumber;
 }
 
 type ChainConfig<T> = {
