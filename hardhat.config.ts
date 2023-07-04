@@ -10,7 +10,6 @@ import {
   ARB_TESTNET_DEPLOYER_KEY,
   BSC_API_KEY,
   BSC_TESTNET_DEPLOYER_KEY,
-  PSC_API_KEY,
   PSC_TESTNET_DEPLOYER_KEY,
 } from "./deploy/constants";
 import "./scripts/deploy";
@@ -48,7 +47,7 @@ module.exports = {
       accounts: [PSC_TESTNET_DEPLOYER_KEY],
     },
     arbitrumGoerli: {
-      url: "https://snowy-dimensional-wave.arbitrum-goerli.quiknode.pro/5fb1a4cbaec64e964facf89b037dabd44bd73b27/",
+      url: "https://arbitrum-goerli.public.blastapi.io",
       chainId: 421613,
       accounts: [ARB_TESTNET_DEPLOYER_KEY],
     },
@@ -86,8 +85,8 @@ module.exports = {
     ],
   },
   defender: {
-    apiKey: process.env.DEFENDER_TEAM_API_KEY,
-    apiSecret: process.env.DEFENDER_TEAM_API_SECRET_KEY,
+    apiKey: process.env.DEFENDER_API_KEY,
+    apiSecret: process.env.DEFENDER_API_SECRET,
   },
   contractSizer: {
     strict: true,

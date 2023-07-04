@@ -4,7 +4,13 @@ import {
   MultiChainTokenConfig,
   MultiCrossChainControlConfig,
 } from "./types";
-import { BigNumber } from "ethers";
+import {
+  COLLECT_FEE_METHOD_PERCENTAGE,
+  COLLECT_FEE_METHOD_RFI_N_PERCENTAGE,
+  TOKEN_PROCESS_METHOD_MC,
+  TOKEN_PROCESS_METHOD_MINTER,
+} from "./constants";
+import { parseEther } from "ethers/lib/utils";
 
 export const POSI: MultiChainToken = {
   name: "POSI",
@@ -13,32 +19,32 @@ export const POSI: MultiChainToken = {
     97: {
       address: "0x09669dF289c10b89d03E14B84839c2d7776D509E",
       decimals: 18,
-      minTransferAmount: BigNumber.from("5000000000000000000"),
+      minTransferAmount: parseEther("5"),
       feePercentage: 1, // 0.1%
-      feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
-      processMethod: 2,
-      collectFeeMethod: 4,
-      maxFeeAmount: BigNumber.from("2000000000000000000"), // In Wei,
+      feeFlatAmount: parseEther("2"),
+      processMethod: TOKEN_PROCESS_METHOD_MC,
+      collectFeeMethod: COLLECT_FEE_METHOD_RFI_N_PERCENTAGE,
+      maxFeeAmount: parseEther("2"),
     },
     421613: {
       address: "0xD55F32ac00Ef30Dec2fcE4D778468a88a45AC5bc",
       decimals: 8,
-      minTransferAmount: BigNumber.from("5000000000000000000"),
+      minTransferAmount: parseEther("5"),
       feePercentage: 1, // 0.1%
-      feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
-      processMethod: 1,
-      collectFeeMethod: 2,
-      maxFeeAmount: BigNumber.from("2000000000000000000"), // In Wei,
+      feeFlatAmount: parseEther("2"),
+      processMethod: TOKEN_PROCESS_METHOD_MINTER,
+      collectFeeMethod: COLLECT_FEE_METHOD_PERCENTAGE,
+      maxFeeAmount: parseEther("2"),
     },
     910000: {
       address: "0x0000000000000000000000000000000000000001",
       decimals: 18,
-      minTransferAmount: BigNumber.from("5000000000000000000"),
+      minTransferAmount: parseEther("5"),
       feePercentage: 1, // 0.1%
-      feeFlatAmount: BigNumber.from("2000000000000000000"), // In Wei
-      processMethod: 2,
-      collectFeeMethod: 2,
-      maxFeeAmount: BigNumber.from("2000000000000000000"), // In Wei,
+      feeFlatAmount: parseEther("2"),
+      processMethod: TOKEN_PROCESS_METHOD_MC,
+      collectFeeMethod: COLLECT_FEE_METHOD_PERCENTAGE,
+      maxFeeAmount: parseEther("2"),
     },
   },
 };

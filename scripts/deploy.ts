@@ -50,4 +50,19 @@ task(
   }
 ).addParam("stage", "Stage");
 
+task(
+  "defenderVerify",
+  "Verify contracts on Defender",
+  async (args: { network: Network; contract: string; url: string }, hre) => {
+    const db = new DeployDataStore(args.network);
+    const contractAddress = await db.findAddressByKey(args.contract);
+    const verification = await hre.defender.verifyDeployment(
+      contractAddress,
+      args.contract,
+      args.url
+    );
+    console.log(`Verified contract ${contractAddress}`);
+  }
+).addParam("stage", "Stage");
+
 export default {};
