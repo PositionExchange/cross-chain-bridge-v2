@@ -17,17 +17,10 @@ const migrations: MigrationDefinition = {
         "CrossChainControl"
       );
 
-      let operator = "";
-      let pauser = "";
-      let refunder = "";
-      if (ctx.stage == "test") {
-        const signers = (await ctx.hre.ethers.getSigners()) || [];
-        operator = signers[0].address;
-        pauser = signers[0].address;
-        refunder = signers[0].address;
-      } else {
-        // TODO: set operator, pauser, refunder for PROD
-      }
+      const signers = (await ctx.hre.ethers.getSigners()) || [];
+      const operator = signers[0].address;
+      const pauser = signers[0].address;
+      const refunder = signers[0].address;
 
       const params: DeployCrossChainBridgeParams = {
         myChainId: chainId,
@@ -55,11 +48,11 @@ const migrations: MigrationDefinition = {
         const destChainId = destChain.chainId;
         const destBridge = destChain.remoteBridge;
 
-        // tx = crossChainBridgeV2.updateBridgeMapping(destChainId, destBridge);
-        // await ctx.factory.waitTx(
-        //   tx,
-        //   `crossChainBridgeV2.updateBridgeMapping config chain ${destChainId} to bridge ${destBridge}`
-        // );
+        tx = crossChainBridgeV2.updateBridgeMapping(destChainId, destBridge);
+        await ctx.factory.waitTx(
+          tx,
+          `crossChainBridgeV2.updateBridgeMapping config chain ${destChainId} to bridge ${destBridge}`
+        );
 
         for (const token: MultiChainToken of destChain.supportTokens) {
           const srcToken: Token = token.config[srcChainId];

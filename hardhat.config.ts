@@ -6,10 +6,10 @@ import "hardhat-contract-sizer";
 import "@openzeppelin/hardhat-defender";
 import "hardhat-docgen";
 import {
-  ARB_API_KEY,
+  ARB_API_KEY, ARB_MAINNET_DEPLOYER_KEY,
   ARB_TESTNET_DEPLOYER_KEY,
-  BSC_API_KEY,
-  BSC_TESTNET_DEPLOYER_KEY,
+  BSC_API_KEY, BSC_MAINNET_DEPLOYER_KEY,
+  BSC_TESTNET_DEPLOYER_KEY, PSC_API_KEY, PSC_MAINNET_DEPLOYER_KEY,
   PSC_TESTNET_DEPLOYER_KEY,
 } from "./deploy/constants";
 import "./scripts/deploy";
@@ -41,15 +41,32 @@ module.exports = {
       gasPrice: 10000000000,
       accounts: [BSC_TESTNET_DEPLOYER_KEY],
     },
+    bsc: {
+      url: "https://bsc-dataseed.binance.org",
+      chainId: 56,
+      gasPrice: 5000000000,
+      accounts: [BSC_MAINNET_DEPLOYER_KEY],
+    },
     pscTestnet: {
       url: "https://api.t.posichain.org/",
       chainId: 910000,
       accounts: [PSC_TESTNET_DEPLOYER_KEY],
     },
+    psc: {
+      url: "https://api.posichain.org/",
+      chainId: 900000,
+      accounts: [PSC_MAINNET_DEPLOYER_KEY],
+    },
     arbitrumGoerli: {
       url: "https://arbitrum-goerli.public.blastapi.io",
       chainId: 421613,
+      gasPrice: 100000000,
       accounts: [ARB_TESTNET_DEPLOYER_KEY],
+    },
+    arbitrumOne: {
+      url: "https://arbitrum-one.publicnode.com",
+      chainId: 42161,
+      accounts: [ARB_MAINNET_DEPLOYER_KEY],
     },
   },
 
@@ -72,6 +89,8 @@ module.exports = {
       bsc: BSC_API_KEY,
       arbitrumGoerli: ARB_API_KEY,
       arbitrumOne: ARB_API_KEY,
+      pscTestnet: PSC_API_KEY,
+      psc: PSC_API_KEY,
     },
     customChains: [
       {
@@ -80,6 +99,14 @@ module.exports = {
         urls: {
           apiURL: "https://explorer-testnet.posichain.org/api",
           browserURL: "https://explorer-testnet.posichain.org",
+        },
+      },
+      {
+        network: "psc",
+        chainId: 900000,
+        urls: {
+          apiURL: "https://blockscout.posichain.org/api",
+          browserURL: "https://blockscout.posichain.org",
         },
       },
     ],

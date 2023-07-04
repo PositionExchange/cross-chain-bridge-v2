@@ -127,6 +127,51 @@ export const BridgeConfigs: {
       },
     ],
   },
+  ////////////////////////////////
+  //////// PRODUCTION ////////////
+  ////////////////////////////////
+  56: {
+    supportChains: [
+      {
+        chainId: 42161,
+        supportTokens: [POSI],
+        remoteBridge: "0x5E62ddF7824f8AB2b2A9d9395a087a9EA5E88c59",
+      },
+      {
+        chainId: 900000,
+        supportTokens: [POSI],
+        remoteBridge: "0x5E62ddF7824f8AB2b2A9d9395a087a9EA5E88c59",
+      },
+    ],
+  },
+  42161: {
+    supportChains: [
+      {
+        chainId: 56,
+        supportTokens: [POSI],
+        remoteBridge: "0x5E62ddF7824f8AB2b2A9d9395a087a9EA5E88c59",
+      },
+      {
+        chainId: 900000,
+        supportTokens: [POSI],
+        remoteBridge: "0x5E62ddF7824f8AB2b2A9d9395a087a9EA5E88c59",
+      },
+    ],
+  },
+  900000: {
+    supportChains: [
+      {
+        chainId: 56,
+        supportTokens: [POSI],
+        remoteBridge: "0x5E62ddF7824f8AB2b2A9d9395a087a9EA5E88c59",
+      },
+      {
+        chainId: 42161,
+        supportTokens: [POSI],
+        remoteBridge: "0x5E62ddF7824f8AB2b2A9d9395a087a9EA5E88c59",
+      },
+    ],
+  },
 };
 
 export const CBCConfigs: {
@@ -171,6 +216,51 @@ export const CBCConfigs: {
         chainId: 421613,
         destCrossChainControl: "0x9Dc19290B7d4F9333A2bE7f8A34A5Ea9D70AaDE8",
         verifier: "0xf042A1810EB328D49d4ae020933bE722B767a54f",
+      },
+    ],
+  },
+  ////////////////////////////////
+  //////// PRODUCTION ////////////
+  ////////////////////////////////
+  56: {
+    supportChains: [
+      {
+        chainId: 42161,
+        destCrossChainControl: "0x28281f0e865B04A7686C76263aa1e1060625a1cB",
+        verifier: "0x65Fb53fa9E98A8551226E26eEe33415Fad3fF09c",
+      },
+      {
+        chainId: 900000,
+        destCrossChainControl: "0x28281f0e865B04A7686C76263aa1e1060625a1cB",
+        verifier: "0x65Fb53fa9E98A8551226E26eEe33415Fad3fF09c",
+      },
+    ],
+  },
+  42161: {
+    supportChains: [
+      {
+        chainId: 56,
+        destCrossChainControl: "0x28281f0e865B04A7686C76263aa1e1060625a1cB",
+        verifier: "0x65Fb53fa9E98A8551226E26eEe33415Fad3fF09c",
+      },
+      {
+        chainId: 900000,
+        destCrossChainControl: "0x28281f0e865B04A7686C76263aa1e1060625a1cB",
+        verifier: "0x65Fb53fa9E98A8551226E26eEe33415Fad3fF09c",
+      },
+    ],
+  },
+  900000: {
+    supportChains: [
+      {
+        chainId: 56,
+        destCrossChainControl: "0x28281f0e865B04A7686C76263aa1e1060625a1cB",
+        verifier: "0x65Fb53fa9E98A8551226E26eEe33415Fad3fF09c",
+      },
+      {
+        chainId: 42161,
+        destCrossChainControl: "0x28281f0e865B04A7686C76263aa1e1060625a1cB",
+        verifier: "0x65Fb53fa9E98A8551226E26eEe33415Fad3fF09c",
       },
     ],
   },

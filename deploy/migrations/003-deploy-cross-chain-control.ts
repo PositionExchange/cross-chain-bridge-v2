@@ -6,7 +6,7 @@ const migrations: MigrationDefinition = {
   getTasks: (ctx: MigrationContext) => ({
     "deploy cross chain control": async () => {
       const chainId: number = ctx.hre.network.config.chainId || 910000; // Default to PSC Testnet
-      const timeHorizon: number = 259200; // 3 days
+      const timeHorizon: number = 604800; // 7 days
 
       await ctx.factory.deployCrossChainControl(chainId, timeHorizon);
     },
