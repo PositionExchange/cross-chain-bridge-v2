@@ -197,4 +197,25 @@ export const SignerConfigs: {
       { chainId: 421613, signer: "0xd7c663fDEFE53860DCA90144Fe8f6Dccb37c57Bb" },
     ],
   },
+  ////////////////////////////////
+  //////// PRODUCTION ////////////
+  ////////////////////////////////
+  56: {
+    supportChains: [
+      { chainId: 42161, signer: "0x27601558F378B833Ad4787103730254C708DA32C" },
+      { chainId: 900000, signer: "0x27601558F378B833Ad4787103730254C708DA32C" },
+    ],
+  },
+  42161: {
+    supportChains: [
+      { chainId: 56, signer: "0x1b071E6BA9d3C10248a59F057AD90A5603a97d8E" },
+      { chainId: 900000, signer: "0x1b071E6BA9d3C10248a59F057AD90A5603a97d8E" },
+    ],
+  },
+  900000: {
+    supportChains: [
+      { chainId: 56, signer: "0x0C170BB1B6aD850b4E4a413e1223eb1A43bEfba8" },
+      { chainId: 42161, signer: "0x0C170BB1B6aD850b4E4a413e1223eb1A43bEfba8" },
+    ],
+  },
 };
