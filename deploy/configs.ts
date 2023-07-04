@@ -46,6 +46,39 @@ export const POSI: MultiChainToken = {
       collectFeeMethod: COLLECT_FEE_METHOD_PERCENTAGE,
       maxFeeAmount: parseEther("2"),
     },
+    ////////////////////////////////
+    //////// PRODUCTION ////////////
+    ////////////////////////////////
+    56: {
+      address: "0x5CA42204cDaa70d5c773946e69dE942b85CA6706",
+      decimals: 18,
+      minTransferAmount: parseEther("5"),
+      feePercentage: 1, // 0.1%
+      feeFlatAmount: parseEther("2"),
+      processMethod: TOKEN_PROCESS_METHOD_MC,
+      collectFeeMethod: COLLECT_FEE_METHOD_RFI_N_PERCENTAGE,
+      maxFeeAmount: parseEther("2"),
+    },
+    42161: {
+      address: "0x97fdA4b9Fbe0efe839EfD2B104E494e3C95CCc44",
+      decimals: 18,
+      minTransferAmount: parseEther("5"),
+      feePercentage: 1, // 0.1%
+      feeFlatAmount: parseEther("2"),
+      processMethod: TOKEN_PROCESS_METHOD_MC,
+      collectFeeMethod: COLLECT_FEE_METHOD_PERCENTAGE,
+      maxFeeAmount: parseEther("2"),
+    },
+    900000: {
+      address: "0x0000000000000000000000000000000000000001", // Native token
+      decimals: 18,
+      minTransferAmount: parseEther("5"),
+      feePercentage: 1, // 0.1%
+      feeFlatAmount: parseEther("2"),
+      processMethod: TOKEN_PROCESS_METHOD_MC,
+      collectFeeMethod: COLLECT_FEE_METHOD_PERCENTAGE,
+      maxFeeAmount: parseEther("2"),
+    },
   },
 };
 
