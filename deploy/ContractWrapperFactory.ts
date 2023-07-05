@@ -2,19 +2,14 @@ import { DeployDataStore } from "./DataStore";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 // @ts-ignore
 import { DeployCrossChainBridgeParams, DeployMockTokenParams } from "./types";
-import {Contract, ContractTransaction} from "ethers";
+import { ContractTransaction } from "ethers";
 import {
   CrossChainBridgeV2,
   CrossChainControl,
   PrimarySignatureVerifier,
 } from "../typeChain";
-import {HardhatDefender} from "@openzeppelin/hardhat-defender/src";
-
-const DEFENDER_SUPPORT_CHAINS = [
-    97,
-    56,
-    4002
-];
+import { HardhatDefender } from "@openzeppelin/hardhat-defender/src";
+import { DefenderSupportedContracts } from "./configs";
 
 export class ContractWrapperFactory {
   defender: HardhatDefender;
@@ -76,17 +71,15 @@ export class ContractWrapperFactory {
       : contractName;
 
     if (contractAddress) {
-      // const chainId = this.hre.network.config.chainId || 0;
-      // const useDefender = DEFENDER_SUPPORT_CHAINS.includes(chainId)
-      // if (useDefender) {
-      //   console.log("using defender");
-      //   const proposal = await this.defender.proposeUpgrade(
-      //       contractAddress,
-      //       factory
-      //   );
-      //   console.log("Upgrade proposal created at:", proposal.url);
-      //   return;
-      // }
+      const chainId = this.hre.network.config.chainId || 0;
+      if ((DefenderSupportedContracts[chainId] || []).includes(contractName)) {
+        const proposal = await this.defender.proposeUpgrade(
+          contractAddress,
+          factory
+        );
+        console.log("Upgrade proposal created at:", proposal.url);
+        return;
+      }
 
       const upgraded = await this.hre.upgrades.upgradeProxy(
         contractAddress,

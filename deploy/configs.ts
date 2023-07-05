@@ -309,3 +309,21 @@ export const SignerConfigs: {
     ],
   },
 };
+
+export const MultiSigConfigs: {
+  [chainId: number]: string;
+} = {
+  56: "0xaE338F4Fff8aE5cFbFEd527338Bc9034b5C5c6d2",
+  42161: "0xBaFC51Cec435E46ddC7a9acadeA4353d09A0Eee9",
+};
+
+export const DefenderSupportedContracts: {
+  [chainId: number]: string[];
+} = {
+  56: ["CrossChainBridgeV2", "CrossChainControl", "PrimarySignatureVerifier"],
+  42161: [
+    "CrossChainBridgeV2",
+    "CrossChainControl",
+    "PrimarySignatureVerifier",
+  ],
+};

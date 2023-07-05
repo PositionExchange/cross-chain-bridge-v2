@@ -3,6 +3,8 @@ import { readdir } from "fs/promises";
 import { MigrationContext, Network, Stage } from "../deploy/types";
 import { ContractWrapperFactory } from "../deploy/ContractWrapperFactory";
 import { DeployDataStore } from "../deploy/DataStore";
+import { MultiSigConfigs } from "../deploy/configs";
+import { sleep } from "@nomicfoundation/hardhat-verify/dist/src/utilities";
 import path = require("path");
 
 task(
@@ -63,6 +65,34 @@ task(
     );
     console.log(`Verified contract ${contractAddress}`);
   }
-).addParam("stage", "Stage");
+);
+
+task(
+  "transferOwnership",
+  "Transfer ownership to multi-sig wallet",
+  async (
+    args: {
+      network: Network;
+    },
+    hre
+  ) => {
+    const chainId = hre.network.config.chainId || 0;
+    const gnosisAddress = MultiSigConfigs[chainId] || "";
+    if (gnosisAddress == "") {
+      throw new Error(
+        `No Gnosis multi-sig wallet configured for chain ${chainId}`
+      );
+    }
+    console.log(
+      `Preparing to transfer ownership to ${gnosisAddress}. Sleeping for 10s, if the address is wrong, Ctrl + C now!`
+    );
+    await sleep(10000);
+    console.log(`Transferring ownership to ${gnosisAddress}...`);
+
+    // The owner of the ProxyAdmin can upgrade our contracts
+    await hre.upgrades.admin.transferProxyAdminOwnership(gnosisAddress);
+    console.log(`Transferred ownership of ProxyAdmin to: ${gnosisAddress}`);
+  }
+);
 
 export default {};
